@@ -1,9 +1,11 @@
-## 2.0.0-dev (fork)
+## 2.0.0 (fork)
 * maintenance moved to a fork by Colin Moldenhauer (https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode); the original project by Christian J. Bell (siegebell) is no longer maintained
 * renamed extension to `ColinMoldenhauer.prettify-symbols-mode-continued` so it can be installed next to the original
 * *breaking*: settings and commands are now prefixed with `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`
 * "pretty" text is now inserted *before* the original text instead of after it
 * add latex support (#38)
+* add default substitutions for Hy (original PR #59 by silver-dragon) and TLA+ (original PR #57 by teodorov)
+* fix spurious "Matches multiple schemas when only one must validate" settings warning when a substitution has both `pretty` and `style` (original issues #50, #62)
 * update dependencies (TypeScript 5, Mocha 10, `@types/vscode` instead of the deprecated `vscode` package) and add a `package-lock.json`; requires VS Code ^1.75.0
 * add GitHub Actions workflow that builds a `.vsix` and creates a GitHub release when a `v*` tag is pushed; the version is taken from the tag
 * add `npm run package` (and `npm run package:install`) to build a `.vsix` locally with a git-derived version
