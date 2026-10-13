@@ -1,4 +1,4 @@
-## Unreleased (fork)
+## 2.0.0-dev (fork)
 * maintenance moved to a fork by Colin Moldenhauer (https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode); the original project by Christian J. Bell (siegebell) is no longer maintained
 * renamed extension to `ColinMoldenhauer.prettify-symbols-mode-continued` so it can be installed next to the original
 * *breaking*: settings and commands are now prefixed with `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`
