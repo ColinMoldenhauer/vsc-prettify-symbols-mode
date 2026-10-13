@@ -171,5 +171,31 @@ psm.activate()
 ```
 
 
+## Development
+Requires Node.js (20 or newer) and VS Code ^1.75.0.
+
+```sh
+npm ci                   # install dependencies
+npm run compile          # compile TypeScript to out/
+npm run watch            # recompile on change
+npm run package          # build a .vsix into dist/ (version derived from git)
+npm run package:install  # build and install it into VS Code (needs the `code` CLI)
+```
+
+To try changes without packaging, open the repository in VS Code and press `F5` to launch an Extension Development Host.
+
+`npm run package` takes the version from `git describe --tags`, e.g. `2.0.0-dev` on a tag or `2.0.0-dev-3-gabc1234` between tags (`-dirty` with uncommitted changes), and leaves `package.json` untouched.
+
+### Releasing
+Push a tag of the form `v<major>.<minor>.<patch>`, optionally with a suffix such as `-dev`:
+
+```sh
+git tag v2.0.0
+git push origin v2.0.0
+```
+
+The [release workflow](.github/workflows/release.yml) sets the extension version from the tag (the version in `package.json` is only a placeholder), builds the `.vsix` and attaches it to a GitHub release. Tags with a suffix are marked as prereleases.
+
+
 ## Credits
 This extension is a fork of [vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode) by Christian J. Bell ([siegebell](https://github.com/siegebell)), which provided the original implementation. The original project is licensed under the MIT license; see [LICENSE](LICENSE).
