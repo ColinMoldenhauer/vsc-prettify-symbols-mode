@@ -18,15 +18,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Check tag matches package.json version
-        run: |
-          pkg_version="$(node -p "require('./package.json').version")"
-          if [ "v${pkg_version}" != "${GITHUB_REF_NAME}" ]; then
-            echo "Tag ${GITHUB_REF_NAME} does not match package.json version v${pkg_version}"
-            exit 1
-          fi
+      - run: npm ci
 
-      - run: npm install
+      - name: Set version from tag
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
 
       - name: Package extension
         run: npx --yes @vscode/vsce package --out prettify-symbols-mode-continued-${{ github.ref_name }}.vsix

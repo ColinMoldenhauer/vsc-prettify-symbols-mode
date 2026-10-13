@@ -392,14 +392,14 @@ export class PrettyModel implements vscode.Disposable {
  /**
  * @returns true if the decorations were invalidated/updated
  */
-  public applyChanges(changes: {range: vscode.Range, text: string}[]) : boolean {
+  public applyChanges(changes: readonly {range: vscode.Range, text: string}[]) : boolean {
     // this.cachedLines = [];
     if(debugging)
       this.debugDecorations.forEach((val) => val.ranges = []);
     // const startTime = new Date().getTime();
     this.changedUglies = false; // assume no changes need to be made for now
     const sortedChanges =
-      changes.sort((change1,change2) => change1.range.start.isAfter(change2.range.start) ? -1 : 1)
+      [...changes].sort((change1,change2) => change1.range.start.isAfter(change2.range.start) ? -1 : 1)
     const adjustedReparseRanges = new RangeSet();
     for(const change of sortedChanges) {
       try {
@@ -522,7 +522,7 @@ export class PrettyModel implements vscode.Disposable {
     return result
   }
 
-  public revealSelections(selections: vscode.Selection[]) : UpdateDecorationEntry {
+  public revealSelections(selections: readonly vscode.Selection[]) : UpdateDecorationEntry {
     const revealUgly = (getRange: (sel:vscode.Selection) => vscode.Range) : UpdateDecorationEntry => {
       const cursorRevealedRanges = new DisjointRangeSet();
       for(const selection of selections) {
@@ -559,7 +559,7 @@ export class PrettyModel implements vscode.Disposable {
     }
  }
 
-  public renderPrettyCursor(selections: vscode.Selection[]) : UpdateDecorationInstanceEntry|null {
+  public renderPrettyCursor(selections: readonly vscode.Selection[]) : UpdateDecorationInstanceEntry|null {
     switch(this.prettyCursor) {
       case 'boxed': {
         const boxPretty = (getRange: (sel:vscode.Selection) => vscode.Range) : UpdateDecorationInstanceEntry|null => {

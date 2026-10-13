@@ -17,7 +17,7 @@ const activeEditorDecorationTimeout = 100;
 const updateSelectionTimeout = 20;
 const inactiveEditorDecorationTimeout = 500;
 
-function arrayEqual<T>(a1: T[], a2: T[], isEqual: (x:T,y:T)=>boolean = ((x,y) => x===y)) : boolean {
+function arrayEqual<T>(a1: readonly T[], a2: readonly T[], isEqual: (x:T,y:T)=>boolean = ((x,y) => x===y)) : boolean {
   if(a1.length!=a2.length)
     return false;
   for(let idx = 0; idx < a1.length; ++idx) {
@@ -28,7 +28,7 @@ function arrayEqual<T>(a1: T[], a2: T[], isEqual: (x:T,y:T)=>boolean = ((x,y) =>
 }
 
 class DebounceFunction implements vscode.Disposable {
-  private timer?: NodeJS.Timer = null;
+  private timer?: NodeJS.Timeout = null;
   private callback?: () => void = null;
   constructor(private timeout: number) {}
   public dispose() {
@@ -173,8 +173,8 @@ export class PrettyDocumentController implements vscode.Disposable {
     this.applyDecorations(this.getEditors(), this.model.getDecorationsList());
   }
 
-  private lastSelections = new Map<vscode.TextEditor, vscode.Selection[]>();
-  public adjustCursor(editor: vscode.TextEditor): null|vscode.Selection[] {
+  private lastSelections = new Map<vscode.TextEditor, readonly vscode.Selection[]>();
+  public adjustCursor(editor: vscode.TextEditor): null|readonly vscode.Selection[] {
     let updated = false;
     let adjustedSelections : vscode.Selection[] = [];
     let before = this.lastSelections.get(editor);
@@ -223,7 +223,7 @@ export class PrettyDocumentController implements vscode.Disposable {
    */
   public selectionChanged(editor: vscode.TextEditor) {
     this.updateSelection.call(() => {
-      let selections: null|vscode.Selection[];
+      let selections: null|readonly vscode.Selection[];
       if(this.adjustCursorMovement) {
         selections = this.adjustCursor(editor);
       } else {
