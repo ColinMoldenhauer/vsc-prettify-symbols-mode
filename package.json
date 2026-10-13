@@ -2,6 +2,7 @@
     "name": "prettify-symbols-mode-continued",
     "displayName": "Prettify Symbols Mode (Continued)",
     "description": "Displays identifiers & symbols using more aesthetically pleasing symbols.",
+    "//version": "Placeholder. The release workflow replaces it with the version of the pushed v* tag (and removes this key) at build time.",
     "version": "0.0.0-development",
     "publisher": "ColinMoldenhauer",
     "license": "MIT license (MIT)",
