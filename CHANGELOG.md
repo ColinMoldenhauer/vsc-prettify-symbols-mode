@@ -1,3 +1,6 @@
+## 2.0.1 (fork)
+* publish to the VS Code Marketplace from the release workflow (Microsoft Entra ID, no personal access token)
+
 ## 2.0.0 (fork)
 * maintenance moved to a fork by Colin Moldenhauer (https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode); the original project by Christian J. Bell (siegebell) is no longer maintained
 * renamed extension to `ColinMoldenhauer.prettify-symbols-mode-continued` so it can be installed next to the original
