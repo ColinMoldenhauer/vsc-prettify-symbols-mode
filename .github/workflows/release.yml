@@ -39,3 +39,31 @@ jobs:
           files: '*.vsix'
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
+
+  publish:
+    # Marketplace rejects versions with a suffix such as -dev, so only publish plain vX.Y.Z tags
+    if: ${{ !contains(github.ref_name, '-') }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment: marketplace
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          # the identity has no Azure role, only Marketplace access
+          allow-no-subscriptions: true
+
+      - name: Publish to the VS Code Marketplace
+        run: npx --yes @vscode/vsce publish --azure-credential --packagePath *.vsix

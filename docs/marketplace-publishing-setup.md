@@ -125,7 +125,7 @@ Website: https://marketplace.visualstudio.com/manage
 
 Scope note: this grants publish rights for all extensions under the publisher. There is no per-extension scoping.
 
-## Step 8 (todo): publish from the release workflow
+## Step 8 (done): publish from the release workflow
 
 Add a job to `.github/workflows/release.yml` that runs after the build, only for tags without a `-` suffix (the Marketplace rejects prerelease suffixes such as `-dev`):
 
