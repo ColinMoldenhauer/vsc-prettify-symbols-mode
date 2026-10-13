@@ -6,6 +6,7 @@
 * add latex support (#38)
 * update dependencies (TypeScript 5, Mocha 10, `@types/vscode` instead of the deprecated `vscode` package) and add a `package-lock.json`; requires VS Code ^1.75.0
 * add GitHub Actions workflow that builds a `.vsix` and creates a GitHub release when a `v*` tag is pushed; the version is taken from the tag
+* add `npm run package` (and `npm run package:install`) to build a `.vsix` locally with a git-derived version
 * update `.vscode/tasks.json` to the current task format
 
 ## 0.4.3

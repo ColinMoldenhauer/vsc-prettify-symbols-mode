@@ -1794,6 +1794,8 @@
         "vscode:prepublish": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "compile": "tsc -p ./",
+        "package": "bash scripts/package.sh",
+        "package:install": "bash scripts/package.sh --install",
         "test": "tsc -p ./ && mocha -u tdd ./out/test",
         "test-debug": "tsc -p ./ && mocha -u tdd --debug-brk=5858 ./out/test"
     },
