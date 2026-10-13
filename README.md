@@ -4,7 +4,7 @@ Prettify symbols mode makes *visual* substitutions to your source code, e.g. dis
 
 This feature is inspired by [prettify-symbols-mode for Emacs](https://www.emacswiki.org/emacs/PrettySymbol).
 
-> **Note:** this is a maintained fork of [siegebell/vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode), which is no longer maintained. It can be installed next to the original: all commands and settings use the prefix `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`, so existing settings need to be renamed. See the [CHANGELOG](CHANGELOG.md) for differences.
+> **Note:** this is a maintained fork of [siegebell/vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode), which is no longer maintained. It can be installed next to the original: all commands and settings use the prefix `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`, so existing settings need to be renamed (e.g. `prettifySymbolsMode.substitutions` becomes `prettifySymbolsModeContinued.substitutions`); the old keys are silently ignored. See the [CHANGELOG](CHANGELOG.md) for differences.
 
 
 ## Installation
