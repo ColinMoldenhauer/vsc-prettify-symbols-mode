@@ -8,15 +8,16 @@ This feature is inspired by [prettify-symbols-mode for Emacs](https://www.emacsw
 
 
 ## Installation
-This fork is **not published to the VS Code Marketplace or Open VSX** (yet). Install it from a GitHub release instead:
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ColinMoldenhauer.prettify-symbols-mode-continued), or from the Extensions view by searching for `ColinMoldenhauer.prettify-symbols-mode-continued`, or from the command line:
 
-1. Download the latest `prettify-symbols-mode-continued-*.vsix` from the [releases page](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/releases).
-2. Install it, either
-    * from the command line: `code --install-extension prettify-symbols-mode-continued-<version>.vsix`, or
-    * in VS Code: open the Extensions view, click the `...` menu in its top right corner, choose *Install from VSIX...* and select the file.
-3. Reload VS Code if prompted.
+```sh
+code --install-extension ColinMoldenhauer.prettify-symbols-mode-continued
+```
 
-To update, repeat the steps with a newer release.
+The extension is not published to Open VSX (yet). For editors that only use Open VSX, or to try a prerelease, install a `.vsix` from the [releases page](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/releases):
+
+* from the command line: `code --install-extension prettify-symbols-mode-continued-<version>.vsix`, or
+* in VS Code: open the Extensions view, click the `...` menu in its top right corner, choose *Install from VSIX...* and select the file.
 
 
 ## Configuration
@@ -194,7 +195,7 @@ git tag v2.0.0
 git push origin v2.0.0
 ```
 
-The [release workflow](.github/workflows/release.yml) sets the extension version from the tag (the version in `package.json` is only a placeholder), builds the `.vsix` and attaches it to a GitHub release. Tags with a suffix are marked as prereleases.
+The [release workflow](.github/workflows/release.yml) sets the extension version from the tag (the version in `package.json` is only a placeholder), builds the `.vsix`, attaches it to a GitHub release and, for plain `vX.Y.Z` tags, publishes it to the VS Code Marketplace. Tags with a suffix (e.g. `-dev`) are marked as prereleases and are not published to the Marketplace. The one-time publishing setup is described in [docs/marketplace-publishing-setup.md](docs/marketplace-publishing-setup.md).
 
 
 ## Credits
