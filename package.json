@@ -1,9 +1,9 @@
 {
-    "name": "prettify-symbols-mode",
-    "displayName": "Prettify Symbols Mode",
+    "name": "prettify-symbols-mode-continued",
+    "displayName": "Prettify Symbols Mode (Continued)",
     "description": "Displays identifiers & symbols using more aesthetically pleasing symbols.",
     "version": "0.4.3",
-    "publisher": "siegebell",
+    "publisher": "ColinMoldenhauer",
     "license": "MIT license (MIT)",
     "engines": {
         "vscode": "^1.20.0"
@@ -18,31 +18,31 @@
     "contributes": {
         "commands": [
             {
-                "command": "prettifySymbolsMode.copyWithSubstitutions",
+                "command": "prettifySymbolsModeContinued.copyWithSubstitutions",
                 "title": "Copy with Substitutions",
-                "category": "Prettify Symbols Mode"
+                "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsMode.enablePrettySymbols",
+                "command": "prettifySymbolsModeContinued.enablePrettySymbols",
                 "title": "Enable",
-                "category": "Prettify Symbols Mode"
+                "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsMode.disablePrettySymbols",
+                "command": "prettifySymbolsModeContinued.disablePrettySymbols",
                 "title": "Disable",
-                "category": "Prettify Symbols Mode"
+                "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsMode.togglePrettySymbols",
+                "command": "prettifySymbolsModeContinued.togglePrettySymbols",
                 "title": "Toggle",
-                "category": "Prettify Symbols Mode"
+                "category": "Prettify Symbols Mode (Continued)"
             }
         ],
         "configuration": {
             "type": "object",
             "title": "Prettify symbols mode",
             "properties": {
-                "prettifySymbolsMode.revealOn": {
+                "prettifySymbolsModeContinued.revealOn": {
                     "enum": [
                         "cursor",
                         "cursor-inside",
@@ -53,12 +53,12 @@
                     "description": "When to reveal the original text. Options are -- 'cursor': reveal when a cursor contacts a symbol; 'cursor-inside': reveal when a cursor is inside a symbol; 'active-line': reveal all symbols on the same line as a cursor; 'selection': reveal all symbols that are selected or contact a cursor; 'none': do not reveal. This option may be overriden per-language by specifying 'revealOn' in a language entry.",
                     "default": "cursor"
                 },
-                "prettifySymbolsMode.adjustCursorMovement": {
+                "prettifySymbolsModeContinued.adjustCursorMovement": {
                     "type": "boolean",
                     "description": "If enabled, cursor movement will treat 'pretty' symbols as one character instead of stepping through the underlying 'ugly' text (this does not currently cover all situations). This option may be overriden per-language by specifying 'adjustCursorMovement' in a language entry.",
                     "default": false
                 },
-                "prettifySymbolsMode.prettyCursor": {
+                "prettifySymbolsModeContinued.prettyCursor": {
                     "enum": [
                         "boxed",
                         "none"
@@ -66,7 +66,7 @@
                     "description": "Controls how a 'pretty' symbol is rendered when contacted by a cursor. Options are -- 'boxed': render an outline around the symbol; 'none': no change. This option may be overriden per-language by specifying 'prettyCursor' in a language entry.",
                     "default": "boxed"
                 },
-                "prettifySymbolsMode.substitutions": {
+                "prettifySymbolsModeContinued.substitutions": {
                     "type": "array",
                     "description": "A list of substitution settings can be specified for each language.",
                     "items": {
@@ -1708,11 +1708,11 @@
 		"@types/node": "^6.0.40"
     },
     "bugs": {
-        "url": "https://github.com/siegebell/vsc-prettify-symbols-mode/issues"
+        "url": "https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/issues"
     },
-    "homepage": "https://github.com/siegebell/vsc-prettify-symbols-mode/blob/master/README.md",
+    "homepage": "https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/blob/master/README.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/siegebell/vsc-prettify-symbols-mode.git"
+        "url": "https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode.git"
     }
 }

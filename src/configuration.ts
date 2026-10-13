@@ -75,7 +75,7 @@ export interface LanguageEntry {
 
 export type HideTextMethod = "hack-fontSize" | "hack-letterSpacing" | "none";
 
-/** The settings for `prettifySymbolsMode.substitutions` */
+/** The settings for `prettifySymbolsModeContinued.substitutions` */
 export interface Settings {
 	/** Main substitution settings, each targetting a different set of languages.
 	 * If more than one entry matches a document, we will pick the one with the
