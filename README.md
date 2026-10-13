@@ -7,6 +7,18 @@ This feature is inspired by [prettify-symbols-mode for Emacs](https://www.emacsw
 > **Note:** this is a maintained fork of [siegebell/vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode), which is no longer maintained. It can be installed next to the original: all commands and settings use the prefix `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`, so existing settings need to be renamed. See the [CHANGELOG](CHANGELOG.md) for differences.
 
 
+## Installation
+This fork is **not published to the VS Code Marketplace or Open VSX** (yet). Install it from a GitHub release instead:
+
+1. Download the latest `prettify-symbols-mode-continued-*.vsix` from the [releases page](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/releases).
+2. Install it, either
+    * from the command line: `code --install-extension prettify-symbols-mode-continued-<version>.vsix`, or
+    * in VS Code: open the Extensions view, click the `...` menu in its top right corner, choose *Install from VSIX...* and select the file.
+3. Reload VS Code if prompted.
+
+To update, repeat the steps with a newer release.
+
+
 ## Configuration
 
 Once you have installed this extension, modify  `settings.json` to add language-specific substitutions. For example, the following settings will target F# files, rendering `fun` as `λ`,  `->` as `⟶`, and place a border around parameters.
