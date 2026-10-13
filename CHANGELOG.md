@@ -1,3 +1,10 @@
+## Unreleased (fork)
+* maintenance moved to a fork by Colin Moldenhauer (https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode); the original project by Christian J. Bell (siegebell) is no longer maintained
+* renamed extension to `ColinMoldenhauer.prettify-symbols-mode-continued` so it can be installed next to the original
+* *breaking*: settings and commands are now prefixed with `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`
+* "pretty" text is now inserted *before* the original text instead of after it
+* add latex support (#38)
+
 ## 0.4.3
 * fix #35
 * *restores* scope support
