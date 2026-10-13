@@ -67,3 +67,28 @@ jobs:
 
       - name: Publish to the VS Code Marketplace
         run: npx --yes @vscode/vsce publish --azure-credential --packagePath *.vsix
+
+  publish-openvsx:
+    # Open VSX (VSCodium, Theia, Gitpod, ...). Skipped with a notice until the OVSX_PAT secret exists.
+    if: ${{ !contains(github.ref_name, '-') }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment: marketplace
+    env:
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Publish to Open VSX
+        if: ${{ env.OVSX_PAT != '' }}
+        run: npx --yes ovsx publish *.vsix -p "$OVSX_PAT"
+
+      - name: Skip notice
+        if: ${{ env.OVSX_PAT == '' }}
+        run: echo "::notice::OVSX_PAT secret is not set, skipping Open VSX publish"

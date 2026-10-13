@@ -134,6 +134,17 @@ Add a job to `.github/workflows/release.yml` that runs after the build, only for
 - `azure/login` with the three variables from Step 5
 - the same version-from-tag step as the build job, then `npx @vscode/vsce publish --azure-credential` (vsce 2.26.1 or newer)
 
+## Open VSX (optional, for VSCodium, Theia, Gitpod and similar)
+
+Separate registry at https://open-vsx.org, token based (no Azure involved).
+
+1. Sign in at https://open-vsx.org with GitHub, link an Eclipse Foundation account and sign the publisher agreement (profile settings).
+2. Create an access token in the profile settings.
+3. Create the namespace once (it must match the `publisher` in `package.json`): `npx ovsx create-namespace ColinMoldenhauer -p <token>`.
+4. Store the token as a secret on the `marketplace` environment (restricts it to `v*` tags):
+   `gh secret set OVSX_PAT -R ColinMoldenhauer/vsc-prettify-symbols-mode --env marketplace`
+5. The `publish-openvsx` job in `.github/workflows/release.yml` publishes plain `vX.Y.Z` tags with `npx ovsx publish`. Until the secret exists it skips with a notice instead of failing.
+
 ## References
 
 - Publishing guide: https://code.visualstudio.com/api/working-with-extensions/publishing-extension (section on secure automated publishing)
