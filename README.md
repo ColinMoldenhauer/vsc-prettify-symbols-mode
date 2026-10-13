@@ -150,10 +150,14 @@ The API is [defined here](https://github.com/ColinMoldenhauer/vsc-prettify-symbo
 Usage:
 ```typescript
 const psm = vscode.extensions.getExtension<PrettifySymbolsMode>('ColinMoldenhauer.prettify-symbols-mode-continued');
-const psmExports = psm.activate()
+psm.activate()
     .then(() => {
-        context.subscriptions.push(psm.exports.onDidEnabledChange(enabled:boolean => {
-            console.log("Prettify-symbols-mode is changed to: ' + enabled ? 'enabled' : 'disabled');
+        context.subscriptions.push(psm.exports.onDidEnabledChange((enabled: boolean) => {
+            console.log('Prettify-symbols-mode is changed to: ' + (enabled ? 'enabled' : 'disabled'));
         }));
-    })
+    });
 ```
+
+
+## Credits
+This extension is a fork of [vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode) by Christian J. Bell ([siegebell](https://github.com/siegebell)), which provided the original implementation. The original project is licensed under the MIT license; see [LICENSE](LICENSE).
