@@ -113,4 +113,31 @@ suite("PrettyModel", () => {
     assert.equal(m.getDecoratedText(range(0,0,2,19)), "aa\r\n_λ\r\nasdf λ as λ asd")
 	});
 
+	suite("insertionPosition", () => {
+    function prettyOptions(insertionPosition?: "before"|"after") {
+      const doc = new MockDocumentModel(["_fun"]);
+      const m = new pm.PrettyModel(doc, langFun, {hideTextMethod: "hack-letterSpacing", insertionPosition});
+      // the pretty decoration is the second entry (after the ugly decoration)
+      return (m.getDecorationsList()[1].decoration as any).options;
+    }
+
+    test("defaults to before", () => {
+      const opts = prettyOptions();
+      assert.equal(opts.before.contentText, "λ");
+      assert.equal(opts.after, undefined);
+    });
+
+    test("before", () => {
+      const opts = prettyOptions("before");
+      assert.equal(opts.before.contentText, "λ");
+      assert.equal(opts.after, undefined);
+    });
+
+    test("after", () => {
+      const opts = prettyOptions("after");
+      assert.equal(opts.after.contentText, "λ");
+      assert.equal(opts.before, undefined);
+    });
+  });
+
 });

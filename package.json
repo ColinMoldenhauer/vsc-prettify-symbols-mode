@@ -2407,8 +2407,8 @@
         "compile": "tsc -p ./",
         "package": "bash scripts/package.sh",
         "package:install": "bash scripts/package.sh --install",
-        "test": "tsc -p ./ && mocha -u tdd ./out/test",
-        "test-debug": "tsc -p ./ && mocha -u tdd --debug-brk=5858 ./out/test"
+        "test": "tsc -p ./ && mocha -u tdd --require ./out/test/register-vscode.js ./out/test/*.test.js",
+        "test-debug": "tsc -p ./ && mocha -u tdd --require ./out/test/register-vscode.js --inspect-brk ./out/test/*.test.js"
     },
     "dependencies": {
         "copy-paste": "^1.5.3"

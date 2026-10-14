@@ -120,7 +120,7 @@ export class Range {
 	public with(start?: Position, end?: Position): Range;
 	public with(change: { start?: Position, end?: Position }): Range;  
   public with(arg1?, arg2?) : Range {
-    if(arg1===undefined || arg1.hasOwnPropert('line'))
+    if(arg1===undefined || arg1.hasOwnProperty('line'))
       return new Range(arg1===undefined ? this.start : arg1 as Position, arg2===undefined ? this.end : arg2 as Position)
     else {
       const change = arg1 as { start?: Position, end?: Position };
@@ -128,3 +128,46 @@ export class Range {
     }
   }
 }
+
+export class Selection extends Range {
+  public readonly anchor: Position;
+  public readonly active: Position;
+  public readonly isReversed: boolean;
+  public constructor(anchor: Position, active: Position);
+  public constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number);
+  public constructor(arg1: number|Position, arg2: number|Position, arg3?: number, arg4?: number) {
+    const anchor = typeof arg1 === 'number' ? new Position(arg1, arg2 as number) : arg1;
+    const active = typeof arg1 === 'number' ? new Position(arg3 as number, arg4 as number) : arg2 as Position;
+    super(anchor.isBefore(active) ? anchor : active, anchor.isBefore(active) ? active : anchor);
+    this.anchor = anchor;
+    this.active = active;
+    this.isReversed = active.isBefore(anchor);
+  }
+}
+
+export enum DecorationRangeBehavior {
+  OpenOpen = 0,
+  ClosedClosed = 1,
+  OpenClosed = 2,
+  ClosedOpen = 3,
+}
+
+export class Disposable {
+  public constructor(private callOnDispose: () => any) {}
+  public dispose() { this.callOnDispose(); }
+}
+
+/** Minimal stand-ins for the parts of the vscode API that are touched at runtime by the unit tests */
+export const window = {
+  visibleTextEditors: [] as any[],
+  activeTextEditor: undefined as any,
+  createTextEditorDecorationType(options: any) {
+    return {key: 'shunt-decoration', options, dispose() {}};
+  },
+};
+
+export const workspace = {
+  onDidChangeTextDocument(listener: (e: any) => any) { return new Disposable(() => {}); },
+};
+
+export const env = {appRoot: ''};
