@@ -82,8 +82,8 @@ The "ugly" text is hidden with a CSS trick; specify `"prettifySymbols.hideTextMe
 
 A "pretty" symbol that is shorter than the "ugly" text it replaces moves the text after it to the left, which misaligns e.g. trailing comments. Specify `"prettifySymbols.preserveAlignment"` to compensate: the width lost by the symbols in front of a gap (a run of spaces) is added at the end of that gap, directly before the next text, as non-breaking spaces. The symbols stay compact and the text after the gap keeps its column. This works no matter where in a word the symbol is (e.g. `sigma` in `sigma_free`). The padding disappears while a symbol in front of it is revealed (see `"revealOn"`). Options are:
 * `"off"`: do not pad (default);
-* `"end-of-line"`: pad only the gap in front of a trailing comment, using the total width lost on the line (the comment is detected with the language's TextMate grammar); or
-* `"all"`: pad every gap of two or more spaces (a single space is left alone), using the width lost since the previous gap.
+* `"comments"`: keep trailing comments aligned; pad only the gap in front of a trailing comment, using the total width lost on the line (the comment is detected with the language's TextMate grammar); or
+* `"columns"`: keep every column aligned; pad every gap of two or more spaces (a single space is left alone), using the width lost since the previous gap.
 
 Tabs are not supported, and a symbol that is longer than the original text is not compensated.
 

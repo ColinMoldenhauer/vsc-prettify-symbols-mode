@@ -189,8 +189,8 @@ export class PrettyModel implements vscode.Disposable {
   /**
    * Computes where to insert spaces so that text after shortened symbols keeps its column: the width lost by the symbols
    * in front of a gap (a run of spaces) is inserted at the end of that gap, i.e. directly before the next text.
-   * - `end-of-line`: only the gap in front of a trailing comment; counts all symbols in front of it
-   * - `all`: every gap of two or more spaces (a single space separates tokens and is left alone); counts the symbols since the previous gap
+   * - `comments`: only the gap in front of a trailing comment; counts all symbols in front of it
+   * - `columns`: every gap of two or more spaces (a single space separates tokens and is left alone); counts the symbols since the previous gap
    * Tabs are not supported: their width depends on the column.
    * @param symbols the substituted ranges on the line (character offsets) and the number of columns each one lost
    * @returns ranges from the first symbol in front of a gap to the end of the gap, and the number of columns to insert at their end
@@ -200,7 +200,7 @@ export class PrettyModel implements vscode.Disposable {
       return [];
 
     const gaps : {start: number, end: number}[] = [];
-    if(this.preserveAlignment === 'end-of-line') {
+    if(this.preserveAlignment === 'comments') {
       const comment = tokens.find(t => t.endIndex > t.startIndex && this.isCommentToken(t));
       if(comment) {
         let start = comment.startIndex;
@@ -218,7 +218,7 @@ export class PrettyModel implements vscode.Disposable {
     const result : {padding: number, range: vscode.Range}[] = [];
     let segmentStart = 0;
     for(const gap of gaps) {
-      const segment = symbols.filter(sym => sym.start >= (this.preserveAlignment === 'all' ? segmentStart : 0) && sym.end <= gap.start);
+      const segment = symbols.filter(sym => sym.start >= (this.preserveAlignment === 'columns' ? segmentStart : 0) && sym.end <= gap.start);
       segmentStart = gap.end;
       const padding = segment.reduce((sum, sym) => sum + sym.lost, 0);
       if(padding > 0 && !line.substring(segment[0].start, gap.end).includes('\t'))

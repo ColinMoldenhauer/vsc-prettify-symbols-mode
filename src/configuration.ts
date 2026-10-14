@@ -16,11 +16,11 @@ export type PrettyCursor =
 /** Where the "pretty" text is inserted relative to the original ("ugly") text */
 export type InsertionPosition = 'before' | 'after';
 
-/** Keeps the text after a substitution at its original column by padding the "pretty" text to the width of the "ugly" text */
+/** Keeps the text after shortened substitutions at its original column by inserting the lost width at the end of a gap of spaces */
 export type PreserveAlignment =
 	  'off'         // do not pad
-	| 'end-of-line' // pad if the substitution is followed by spaces and then a comment
-	| 'all';        // pad if the substitution is followed by spaces
+	| 'comments'    // keep trailing comments aligned: pad the gap in front of a trailing comment
+	| 'columns';    // keep columns aligned: pad every gap of two or more spaces
 
 /** Essentially mirrors vscode.DecorationRenderOptions, but restricted to the
  * properties that apply to both :before/:after decorations and plain decorations */

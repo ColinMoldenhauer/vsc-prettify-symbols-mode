@@ -279,7 +279,7 @@ async function openDocument(doc: vscode.TextDocument) {
     } else {
       const language = getLanguageEntry(doc);
       if(language && language.substitutions.length > 0) {
-        const usesScopes = language.substitutions.some(s => s.scope !== undefined) || settings.preserveAlignment === 'end-of-line';
+        const usesScopes = language.substitutions.some(s => s.scope !== undefined) || settings.preserveAlignment === 'comments';
         let grammar : tm.IGrammar = undefined;
         if(textMateRegistry && usesScopes) {
           try {

@@ -97,15 +97,15 @@
                 "prettifySymbols.preserveAlignment": {
                     "enum": [
                         "off",
-                        "end-of-line",
-                        "all"
+                        "comments",
+                        "columns"
                     ],
                     "enumDescriptions": [
                         "Do not pad: text after a shortened symbol moves to the left.",
                         "Insert the width lost by shortened symbols before a trailing comment, so that trailing comments stay aligned.",
                         "Insert the width lost by shortened symbols at the end of every run of two or more spaces, so that all text after such a gap keeps its column."
                     ],
-                    "markdownDescription": "Keeps the text after shortened symbols at its original column by inserting the width they lost (as spaces) directly before the next text after a run of spaces. Tabs are not supported. `end-of-line` needs a TextMate grammar for the language to detect comments.",
+                    "markdownDescription": "Keeps the text after shortened symbols at its original column by inserting the width they lost (as spaces) directly before the next text after a run of spaces. Tabs are not supported. `comments` needs a TextMate grammar for the language to detect comments.",
                     "default": "off"
                 },
                 "prettifySymbols.substitutions": {

@@ -158,7 +158,7 @@ suite("PrettyModel", () => {
       combineIdenticalScopes: false,
     };
 
-    function model(lines: string[], preserveAlignment: "off"|"end-of-line"|"all", hideTextMethod: any = "hack-letterSpacing") {
+    function model(lines: string[], preserveAlignment: "off"|"comments"|"columns", hideTextMethod: any = "hack-letterSpacing") {
       const doc = new MockDocumentModel(lines);
       return {doc, m: new pm.PrettyModel(doc, langSigma, {hideTextMethod, preserveAlignment, textMateGrammar: commentGrammar})};
     }
@@ -176,63 +176,63 @@ suite("PrettyModel", () => {
       assert.deepStrictEqual(paddings(m), []);
     });
 
-    test("end-of-line pads before the comment, also if the word continues after the symbol", () => {
+    test("comments pads before the comment, also if the word continues after the symbol", () => {
       //                    0         1         2
       //                    0123456789012345678901234
-      const {m} = model(["double sigma_free    # c"], "end-of-line");
+      const {m} = model(["double sigma_free    # c"], "comments");
       assert.deepStrictEqual(paddings(m), [{columns: 4, ranges: [range(0,7,0,21)]}]);
     });
 
-    test("end-of-line pads the whole line's lost width before the comment", () => {
-      const {m} = model(["double sigma_a + sigma_b  # c"], "end-of-line");
+    test("comments pads the whole line's lost width before the comment", () => {
+      const {m} = model(["double sigma_a + sigma_b  # c"], "comments");
       assert.deepStrictEqual(paddings(m), [{columns: 8, ranges: [range(0,7,0,26)]}]);
     });
 
-    test("end-of-line pads even if the last word has no symbol", () => {
-      const {m} = model(["double sigma_a + nu  # c"], "end-of-line");
+    test("comments pads even if the last word has no symbol", () => {
+      const {m} = model(["double sigma_a + nu  # c"], "comments");
       assert.deepStrictEqual(paddings(m), [{columns: 4, ranges: [range(0,7,0,21)]}]);
     });
 
-    test("end-of-line ignores symbols in the comment", () => {
-      const {m} = model(["double x  # sigma"], "end-of-line");
+    test("comments ignores symbols in the comment", () => {
+      const {m} = model(["double x  # sigma"], "comments");
       assert.deepStrictEqual(paddings(m), []);
     });
 
-    test("end-of-line needs a comment, spaces and nothing lost", () => {
-      assert.deepStrictEqual(paddings(model(["double sigma_a    x"], "end-of-line").m), []);
-      assert.deepStrictEqual(paddings(model(["double sigma_a# c"], "end-of-line").m), []);
-      assert.deepStrictEqual(paddings(model(["double nu    # c"], "end-of-line").m), []);
+    test("comments needs a comment, spaces and nothing lost", () => {
+      assert.deepStrictEqual(paddings(model(["double sigma_a    x"], "comments").m), []);
+      assert.deepStrictEqual(paddings(model(["double sigma_a# c"], "comments").m), []);
+      assert.deepStrictEqual(paddings(model(["double nu    # c"], "comments").m), []);
     });
 
-    test("end-of-line pads a single space before the comment", () => {
-      const {m} = model(["sigma # c"], "end-of-line");
+    test("comments pads a single space before the comment", () => {
+      const {m} = model(["sigma # c"], "comments");
       assert.deepStrictEqual(paddings(m), [{columns: 4, ranges: [range(0,0,0,6)]}]);
     });
 
-    test("all pads every gap of two or more spaces", () => {
+    test("columns pads every gap of two or more spaces", () => {
       //                    0         1         2
       //                    0123456789012345678901234567
-      const {m} = model(["sigma_x  sigma_y   z + nu  w"], "all");
+      const {m} = model(["sigma_x  sigma_y   z + nu  w"], "columns");
       assert.deepStrictEqual(paddings(m), [{columns: 4, ranges: [range(0,0,0,9), range(0,9,0,19)]}]);
     });
 
-    test("all ignores single spaces and indentation", () => {
-      assert.deepStrictEqual(paddings(model(["    sigma x"], "all").m), []);
-      assert.deepStrictEqual(paddings(model(["  sigma_x y"], "all").m), []);
+    test("columns ignores single spaces and indentation", () => {
+      assert.deepStrictEqual(paddings(model(["    sigma x"], "columns").m), []);
+      assert.deepStrictEqual(paddings(model(["  sigma_x y"], "columns").m), []);
     });
 
     test("does not pad when hiding is disabled", () => {
-      const {m} = model(["double sigma_free    # c"], "all", "none");
+      const {m} = model(["double sigma_free    # c"], "columns", "none");
       assert.deepStrictEqual(paddings(m), []);
     });
 
     test("does not pad lines with tabs between symbol and gap", () => {
-      const {m} = model(["sigma\tx    # c"], "end-of-line");
+      const {m} = model(["sigma\tx    # c"], "comments");
       assert.deepStrictEqual(paddings(m), []);
     });
 
     test("removing the comment removes the padding", () => {
-      const {doc, m} = model(["double sigma_free    # c"], "end-of-line");
+      const {doc, m} = model(["double sigma_free    # c"], "comments");
       assert.equal(paddings(m).length, 1);
       doc.lines = ["double sigma_free    x"];
       m.applyChanges([{range: range(0,21,0,24), text: "x"}]);
@@ -240,7 +240,7 @@ suite("PrettyModel", () => {
     });
 
     test("typing a comment adds the padding", () => {
-      const {doc, m} = model(["double sigma_free    "], "end-of-line");
+      const {doc, m} = model(["double sigma_free    "], "comments");
       assert.deepStrictEqual(paddings(m), []);
       doc.lines = ["double sigma_free    #"];
       m.applyChanges([{range: range(0,21,0,21), text: "#"}]);
@@ -248,7 +248,7 @@ suite("PrettyModel", () => {
     });
 
     test("padding follows edits in front of the line and on other lines", () => {
-      const {doc, m} = model(["double sigma_free    # c"], "end-of-line");
+      const {doc, m} = model(["double sigma_free    # c"], "comments");
       doc.lines = ["double sigma_free    # c", "x"];
       m.applyChanges([{range: range(0,22,0,23), text: "c\r\nx"}].slice(0,0));
       doc.lines = ["x", "double sigma_free    # c"];
@@ -260,7 +260,7 @@ suite("PrettyModel", () => {
     });
 
     test("getDecoratedText ignores the padding", () => {
-      const {m} = model(["sigma_x    # c"], "end-of-line");
+      const {m} = model(["sigma_x    # c"], "comments");
       assert.equal(m.getDecoratedText(range(0,0,0,14)), "σ_x    # c");
     });
   });

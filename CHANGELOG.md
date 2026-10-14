@@ -4,7 +4,7 @@
 * fix TextMate grammars not loading on current VS Code versions (promise-based `vscode-textmate` API): documents using `scope` substitutions were never prettified; the callback-based API of old `vscode-textmate` versions is no longer supported
 * give up loading a grammar after 10 s so that the document is prettified without it instead of not at all
 * fix decorations of one document being applied to the active editor of another document, e.g. after saving a settings file while another file with substitutions is open
-* add setting `prettifySymbols.preserveAlignment` (`"off"` (default), `"end-of-line"` or `"all"`) to keep trailing comments (or all text after a gap of spaces) at their column: the width lost by shortened symbols is inserted before the next text after the gap
+* add setting `prettifySymbols.preserveAlignment` (`"off"` (default), `"comments"` or `"columns"`) to keep trailing comments (or all text after a gap of spaces) at their column: the width lost by shortened symbols is inserted before the next text after the gap
 * new extension icon: `alpha` translated into `α`, as two cards; the previous icon is now the showcase image in the README
 
 ## 2.2.0 (fork)
