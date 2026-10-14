@@ -14,7 +14,7 @@ Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/item
 code --install-extension ColinMoldenhauer.prettify-symbols-mode-continued
 ```
 
-The extension is not published to Open VSX (yet). For editors that only use Open VSX, or to try a prerelease, install a `.vsix` from the [releases page](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/releases):
+It is also published on [Open VSX](https://open-vsx.org/extension/ColinMoldenhauer/prettify-symbols-mode-continued), for VSCodium, Eclipse Theia, Gitpod and other editors that use it. To try a prerelease, install a `.vsix` from the [releases page](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/releases):
 
 * from the command line: `code --install-extension prettify-symbols-mode-continued-<version>.vsix`, or
 * in VS Code: open the Extensions view, click the `...` menu in its top right corner, choose *Install from VSIX...* and select the file.
@@ -212,7 +212,7 @@ git tag v2.0.0
 git push origin v2.0.0
 ```
 
-The [release workflow](.github/workflows/release.yml) sets the extension version from the tag (the version in `package.json` is only a placeholder), builds the `.vsix`, attaches it to a GitHub release and, for plain `vX.Y.Z` tags, publishes it to the VS Code Marketplace. Tags with a suffix (e.g. `-dev`) are marked as prereleases and are not published to the Marketplace. The one-time publishing setup is described in [docs/marketplace-publishing-setup.md](docs/marketplace-publishing-setup.md).
+The [release workflow](.github/workflows/release.yml) sets the extension version from the tag (the version in `package.json` is only a placeholder), builds the `.vsix`, attaches it to a GitHub release and, for plain `vX.Y.Z` tags, publishes it to the VS Code Marketplace and Open VSX. Tags with a suffix (e.g. `-dev`) are marked as prereleases and are not published to either registry. The one-time publishing setup (Marketplace and Open VSX) is described in [docs/marketplace-publishing-setup.md](docs/marketplace-publishing-setup.md).
 
 
 ## Credits

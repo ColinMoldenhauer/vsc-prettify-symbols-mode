@@ -134,7 +134,7 @@ Add a job to `.github/workflows/release.yml` that runs after the build, only for
 - `azure/login` with the three variables from Step 5
 - the same version-from-tag step as the build job, then `npx @vscode/vsce publish --azure-credential` (vsce 2.26.1 or newer)
 
-## Open VSX (optional, for VSCodium, Theia, Gitpod and similar)
+## Open VSX (done; for VSCodium, Theia, Gitpod and similar)
 
 Separate registry at https://open-vsx.org, token based (no Azure involved).
 
@@ -143,10 +143,10 @@ Separate registry at https://open-vsx.org, token based (no Azure involved).
 3. Create the namespace once (it must match the `publisher` in `package.json`): `npx ovsx create-namespace ColinMoldenhauer -p <token>`.
 4. Store the token as a secret on the `marketplace` environment (restricts it to `v*` tags):
    `gh secret set OVSX_PAT -R ColinMoldenhauer/vsc-prettify-symbols-mode --env marketplace`
-5. The `publish-openvsx` job in `.github/workflows/release.yml` publishes plain `vX.Y.Z` tags with `npx ovsx publish`. Until the secret exists it skips with a notice instead of failing.
+5. The `publish-openvsx` job in `.github/workflows/release.yml` publishes plain `vX.Y.Z` tags with `npx ovsx publish`. Until the secret exists it skips with a notice instead of failing. First published with v2.1.0.
 
 ## References
 
 - Publishing guide: https://code.visualstudio.com/api/working-with-extensions/publishing-extension (section on secure automated publishing)
 - The documented flow targets Azure DevOps Pipelines; the GitHub Actions variant above (OIDC with `azure/login`) is adapted and has not been verified end to end yet.
-- Alternative registry without an Azure setup: Open VSX (token-based).
+- Open VSX listing: https://open-vsx.org/extension/ColinMoldenhauer/prettify-symbols-mode-continued
