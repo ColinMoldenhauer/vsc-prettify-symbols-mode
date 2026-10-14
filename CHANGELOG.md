@@ -1,4 +1,5 @@
 ## Unreleased
+* fix decorations of one document being applied to the active editor of another document, e.g. after saving a settings file while another file with substitutions is open
 * new extension icon: `alpha` translated into `α`, as two cards; the previous icon is now the showcase image in the README
 
 ## 2.2.0 (fork)

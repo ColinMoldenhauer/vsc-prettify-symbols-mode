@@ -83,11 +83,12 @@ export class PrettyDocumentController implements vscode.Disposable {
     this.subscriptions.forEach((s) => s.dispose());
   }
 
+  private isOwnEditor(editor: vscode.TextEditor|undefined) : editor is vscode.TextEditor {
+    return editor !== undefined && editor.document.uri.toString() === this.document.uri.toString();
+  }
+
   private getEditors() {
-    return vscode.window.visibleTextEditors
-      .filter((editor) => {
-        return editor.document.uri === this.document.uri;
-      });
+    return vscode.window.visibleTextEditors.filter(editor => this.isOwnEditor(editor));
   }
 
   public gotFocus(editor: vscode.TextEditor) {
@@ -159,7 +160,9 @@ export class PrettyDocumentController implements vscode.Disposable {
 
   private applyDecorations(editors: Iterable<vscode.TextEditor>, decs: UpdateDecorationEntry[]) {
     this.currentDecorations = decs;
-    this.applyActiveEditorDecorations([vscode.window.activeTextEditor], decs);
+    // the active editor may show a different document (e.g. when settings are reloaded while another file is focused)
+    const activeEditor = vscode.window.activeTextEditor;
+    this.applyActiveEditorDecorations(this.isOwnEditor(activeEditor) ? [activeEditor] : [], decs);
     this.applyInactiveEditorDecorations(editors, decs);
   }
 
