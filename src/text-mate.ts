@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 const tm = loadTextMate();
@@ -57,45 +58,65 @@ export function matchScope(scope: string, scopes: string[]) : boolean {
   return true;
 }
 
+/** Loads grammars by scope name */
 export interface Registry {
-  new (locator?: IGrammarLocator);
   /**
    * Load the grammar for `scopeName` and all referenced included grammars asynchronously.
+   * Resolves to `null` if the grammar cannot be found.
    */
-  loadGrammar(initialScopeName: string, callback: (err: any, grammar: IGrammar) => void): void;
-  /**
-   * Load the grammar at `path` synchronously.
-   */
-  loadGrammarFromPathSync(path: string): IGrammar;
-  /**
-   * Get the grammar for `scopeName`. The grammar must first be created via `loadGrammar` or `loadGrammarFromPathSync`.
-   */
-  grammarForScopeName(scopeName: string): IGrammar;
-}  
-
-const dummyGrammar: IGrammar = {
-  tokenizeLine(lineText: string, prevState: StackElement): ITokenizeLineResult {
-    return {
-      tokens: [],
-      ruleStack: prevState,
-    }        
-  }
+  loadGrammar(scopeName: string): Promise<IGrammar|null>;
 }
 
-class DummyRegistry {
-  public constructor(locator?: IGrammarLocator) {}
-  loadGrammar(initialScopeName: string, callback: (err: any, grammar: IGrammar) => void) {
-    callback(new Error("textmate cannot be loaded"), undefined);
+/** Reads the first file that exists among the candidates */
+function readFirstFile(candidates: string[]) : Buffer {
+  for(const file of candidates) {
+    try {
+      return fs.readFileSync(file);
+    } catch(err) { }
   }
-  loadGrammarFromPathSync(path: string): IGrammar {
-    return dummyGrammar;
-  }
-  grammarForScopeName(scopeName: string): IGrammar {
-    return dummyGrammar;
-  }
+  throw new Error(`None of these files can be read: ${candidates.join(', ')}`);
 }
 
-export const Registry : Registry = tm == null ? (DummyRegistry as any) : tm.Registry;
+let onigLib : Promise<{createOnigScanner: (sources: string[]) => any, createOnigString: (str: string) => any}> | undefined;
+
+/** Oniguruma is the regular expression engine of TextMate grammars; its WASM binary has to be loaded (once) */
+function loadOnigLib() {
+  if(!onigLib) {
+    onigLib = (async () => {
+      const oniguruma = getNodeModule('vscode-oniguruma');
+      if(!oniguruma)
+        throw new Error('vscode-oniguruma cannot be loaded');
+      const wasm = readFirstFile([
+        `${vscode.env.appRoot}/node_modules.asar.unpacked/vscode-oniguruma/release/onig.wasm`,
+        `${vscode.env.appRoot}/node_modules.asar/vscode-oniguruma/release/onig.wasm`,
+        `${vscode.env.appRoot}/node_modules/vscode-oniguruma/release/onig.wasm`,
+      ]);
+      await oniguruma.loadWASM(wasm.buffer.slice(wasm.byteOffset, wasm.byteOffset + wasm.byteLength));
+      return {
+        createOnigScanner: (sources: string[]) => new oniguruma.OnigScanner(sources),
+        createOnigString: (str: string) => new oniguruma.OnigString(str),
+      };
+    })();
+    onigLib.catch(() => {}); // the error is reported when a grammar is loaded
+  }
+  return onigLib;
+}
+
+/** Creates a registry that uses the `vscode-textmate` of VS Code (promise-based API of version 5 and later) */
+export function createRegistry(locator: IGrammarLocator) : Registry {
+  if(tm == null)
+    throw new Error('vscode-textmate cannot be loaded');
+  return new tm.Registry({
+    onigLib: loadOnigLib(),
+    loadGrammar: async (scopeName: string) => {
+      const file = locator.getFilePath(scopeName);
+      if(!file)
+        return null;
+      return tm.parseRawGrammar(await fs.promises.readFile(file, 'utf8'), file);
+    },
+    getInjections: (scopeName: string) => locator.getInjections ? locator.getInjections(scopeName) : [],
+  });
+}
 
 /**
  * A registry helper that can locate grammar file paths given scope names.

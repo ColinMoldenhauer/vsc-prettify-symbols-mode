@@ -171,7 +171,7 @@ function onConfigurationChanged(){
 /** Re-read the settings and recreate substitutions for all documents */
 function reloadConfiguration() {
   try {
-    textMateRegistry = new tm.Registry(grammarLocator);
+    textMateRegistry = tm.createRegistry(grammarLocator);
   } catch(err) {
     textMateRegistry = undefined;
     console.error(err);
@@ -247,19 +247,22 @@ function getLanguageEntry(doc: vscode.TextDocument) : LanguageEntry {
   return entry;
 }
 
+/** Give up waiting for a grammar: without it, the document would never be prettified */
+const grammarLoadTimeout = 10000;
+
 async function loadGrammar(scopeName: string) : Promise<tm.IGrammar> {
-  return new Promise<tm.IGrammar>((resolve,reject) => {
-    try {
-      textMateRegistry.loadGrammar(scopeName, (err, grammar) => {
-        if(err)
-          reject(err)
-        else
-          resolve(grammar);
-      })
-    } catch(err) {
-      reject(err);
-    }
-  })
+  let timer : NodeJS.Timeout|undefined;
+  const timeout = new Promise<never>((_,reject) => {
+    timer = setTimeout(() => reject(new Error(`Timeout while loading the grammar ${scopeName}`)), grammarLoadTimeout);
+  });
+  try {
+    const grammar = await Promise.race([textMateRegistry.loadGrammar(scopeName), timeout]);
+    if(!grammar)
+      throw new Error(`Cannot find the grammar ${scopeName}`);
+    return grammar;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function openDocument(doc: vscode.TextDocument) {
