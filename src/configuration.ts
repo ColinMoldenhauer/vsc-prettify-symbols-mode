@@ -16,6 +16,12 @@ export type PrettyCursor =
 /** Where the "pretty" text is inserted relative to the original ("ugly") text */
 export type InsertionPosition = 'before' | 'after';
 
+/** Keeps the text after a substitution at its original column by padding the "pretty" text to the width of the "ugly" text */
+export type PreserveAlignment =
+	  'off'         // do not pad
+	| 'end-of-line' // pad if the substitution is followed by spaces and then a comment
+	| 'all';        // pad if the substitution is followed by spaces
+
 /** Essentially mirrors vscode.DecorationRenderOptions, but restricted to the
  * properties that apply to both :before/:after decorations and plain decorations */
 export interface PrettyStyleProperties {
@@ -96,4 +102,6 @@ export interface Settings {
 	hideTextMethod: HideTextMethod,
 	/** where to insert the "pretty" text relative to the original text */
 	insertionPosition: InsertionPosition,
+	/** pad shortened substitutions so that the text after them keeps its column */
+	preserveAlignment: PreserveAlignment,
 }

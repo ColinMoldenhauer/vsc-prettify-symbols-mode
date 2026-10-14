@@ -71,6 +71,15 @@ By default, the "pretty" text is inserted *before* the original text. Specify `"
 * `"before"`: insert the "pretty" text before the original text (default); this avoids issues with the syntax highlighting; or
 * `"after"`: insert the "pretty" text after the original text.
 
+### Preserve alignment
+
+A "pretty" symbol that is shorter than the "ugly" text it replaces moves the text after it to the left, which misaligns e.g. trailing comments. Specify `"prettifySymbols.preserveAlignment"` to pad the "pretty" text with spaces up to the width of the "ugly" text. The padding disappears together with the symbol when the "ugly" text is revealed. Options are:
+* `"off"`: do not pad (default);
+* `"end-of-line"`: pad if the symbol is followed by spaces and then a comment, so that trailing comments stay aligned (the comment is detected with the language's TextMate grammar); or
+* `"all"`: pad if the symbol is followed by spaces, so that all text after those spaces keeps its column.
+
+Only spaces are supported (not tabs), and only the symbol directly in front of the spaces is padded: if a line has further symbols before it, the text after them still shifts.
+
 ### Adjust cursor movement
 
 By default, cursor movement will traverse the characters of the "ugly" text -- this will cause it to become invisible while inside the text if it is not revealed (see `"revealOn"`). Setting `"prettifySymbols.adjustCursorMovement"` to `true` will tweak cursor movement so that "pretty" symbols behave as a single character. This can be overriden per-language by specifying `"adjustCursorMovement"` in a language entry. In particular, left or right movement will cause the cursor to jump over the symbol instead of going inside. However, this setting does not currently account for all kinds of cursor movement, e.g. up/down.

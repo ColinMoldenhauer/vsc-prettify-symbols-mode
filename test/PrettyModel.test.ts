@@ -140,4 +140,82 @@ suite("PrettyModel", () => {
     });
   });
 
+  suite("preserveAlignment", () => {
+    /** a stand-in grammar: everything from the first `#` on is a comment */
+    const commentGrammar : any = {
+      tokenizeLine: (line: string) => {
+        const idx = line.indexOf('#');
+        const tokens = idx < 0
+          ? [{startIndex: 0, endIndex: line.length, scopes: ['source']}]
+          : [{startIndex: 0, endIndex: idx, scopes: ['source']}, {startIndex: idx, endIndex: line.length, scopes: ['source', 'comment.line.number-sign']}];
+        return {tokens, ruleStack: {equals: () => true}};
+      },
+    };
+
+    function model(lines: string[], preserveAlignment: "off"|"end-of-line"|"all", hideTextMethod: any = "hack-letterSpacing") {
+      const doc = new MockDocumentModel(lines);
+      return {doc, m: new pm.PrettyModel(doc, langFun, {hideTextMethod, preserveAlignment, textMateGrammar: commentGrammar})};
+    }
+
+    /** the contentText of each decoration that has ranges */
+    function padded(m: pm.PrettyModel) {
+      return m.getDecorationsList()
+        .filter(d => d.ranges.length > 0 && (d.decoration as any).options.before)
+        .map(d => ({text: (d.decoration as any).options.before.contentText, ranges: d.ranges}));
+    }
+
+    test("off", () => {
+      const {m} = model(["fun   # c"], "off");
+      assert.deepStrictEqual(padded(m), [{text: "λ", ranges: [range(0,0,0,3)]}]);
+    });
+
+    test("end-of-line pads before a trailing comment", () => {
+      const {m} = model(["fun   # c"], "end-of-line");
+      assert.deepStrictEqual(padded(m), [{text: "λ\u00a0\u00a0", ranges: [range(0,0,0,3)]}]);
+    });
+
+    test("end-of-line does not pad before code", () => {
+      const {m} = model(["fun   x # c"], "end-of-line");
+      assert.deepStrictEqual(padded(m), [{text: "λ", ranges: [range(0,0,0,3)]}]);
+    });
+
+    test("end-of-line does not pad without spaces", () => {
+      const {m} = model(["fun# c"], "end-of-line");
+      assert.deepStrictEqual(padded(m), [{text: "λ", ranges: [range(0,0,0,3)]}]);
+    });
+
+    test("all pads before code", () => {
+      const {m} = model(["fun   x", "fun"], "all");
+      const byText = new Map(padded(m).map(d => [d.text, d.ranges]));
+      assert.deepStrictEqual(byText.get("λ\u00a0\u00a0"), [range(0,0,0,3)]);
+      assert.deepStrictEqual(byText.get("λ"), [range(1,0,1,3)]);
+    });
+
+    test("does not pad when hiding is disabled", () => {
+      const {m} = model(["fun   # c"], "all", "none");
+      assert.deepStrictEqual(padded(m), [{text: "λ", ranges: [range(0,0,0,3)]}]);
+    });
+
+    test("removing the comment removes the padding", () => {
+      const {doc, m} = model(["fun   # c"], "end-of-line");
+      assert.deepStrictEqual(padded(m).map(d => d.text), ["λ\u00a0\u00a0"]);
+      doc.lines = ["fun   x"];
+      m.applyChanges([{range: range(0,6,0,9), text: "x"}]);
+      assert.deepStrictEqual(padded(m).map(d => d.text), ["λ"]);
+    });
+
+    test("typing a comment pads the symbol", () => {
+      const {doc, m} = model(["fun   "], "end-of-line");
+      assert.deepStrictEqual(padded(m).map(d => d.text), ["λ"]);
+      doc.lines = ["fun   #"];
+      m.applyChanges([{range: range(0,6,0,6), text: "#"}]);
+      assert.deepStrictEqual(padded(m).map(d => d.text), ["λ\u00a0\u00a0"]);
+    });
+
+    test("getDecoratedText ignores the padding", () => {
+      const {m} = model(["fun   # c"], "end-of-line");
+      assert.equal(m.getDecoratedText(range(0,0,0,9)), "λ   # c");
+    });
+  });
+
 });

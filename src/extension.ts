@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as util from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
-import {Settings, LanguageEntry, Substitution, UglyRevelation, PrettyCursor, HideTextMethod, InsertionPosition} from './configuration';
+import {Settings, LanguageEntry, Substitution, UglyRevelation, PrettyCursor, HideTextMethod, InsertionPosition, PreserveAlignment} from './configuration';
 import {PrettyDocumentController} from './document';
 import * as api from './api';
 import * as tm from './text-mate';
@@ -185,6 +185,7 @@ function reloadConfiguration() {
     prettyCursor: configuration.get<PrettyCursor>("prettyCursor","boxed"),
     hideTextMethod: configuration.get<HideTextMethod>("hideTextMethod","hack-letterSpacing"),
     insertionPosition: configuration.get<InsertionPosition>("insertionPosition","before"),
+    preserveAlignment: configuration.get<PreserveAlignment>("preserveAlignment","off"),
   };
 
   // Set default values for language-properties that were not specified
@@ -275,7 +276,7 @@ async function openDocument(doc: vscode.TextDocument) {
     } else {
       const language = getLanguageEntry(doc);
       if(language && language.substitutions.length > 0) {
-        const usesScopes = language.substitutions.some(s => s.scope !== undefined);
+        const usesScopes = language.substitutions.some(s => s.scope !== undefined) || settings.preserveAlignment === 'end-of-line';
         let grammar : tm.IGrammar = undefined;
         if(textMateRegistry && usesScopes) {
           try {
@@ -285,7 +286,7 @@ async function openDocument(doc: vscode.TextDocument) {
             console.error(error);
           }
         }
-        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, insertionPosition: settings.insertionPosition, textMateGrammar: grammar}));
+        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, insertionPosition: settings.insertionPosition, preserveAlignment: settings.preserveAlignment, textMateGrammar: grammar}));
       }
     }
   } catch(err) {}

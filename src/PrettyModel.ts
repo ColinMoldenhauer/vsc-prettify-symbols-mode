@@ -6,7 +6,7 @@
  * Models the substitutions within a text document
  */
 import * as vscode from 'vscode';
-import {Substitution, UglyRevelation, LanguageEntry, PrettyCursor, PrettyStyleProperties, PrettyStyle, assignStyleProperties, HideTextMethod, InsertionPosition} from './configuration';
+import {Substitution, UglyRevelation, LanguageEntry, PrettyCursor, PrettyStyleProperties, PrettyStyle, assignStyleProperties, HideTextMethod, InsertionPosition, PreserveAlignment} from './configuration';
 import {RangeSet} from './RangeSet';
 import {DisjointRangeSet} from './DisjointRangeSet';
 import * as drangeset from './DisjointRangeSet';
@@ -26,6 +26,8 @@ interface PrettySubstitution {
 	ranges: DisjointRangeSet,
   index: number,
   scope?: string,
+  /** the original substitution; used to create padded variants of the decoration */
+  source?: Substitution,
 }
 
 export interface DocumentModel {
@@ -52,6 +54,8 @@ export class PrettyModel implements vscode.Disposable {
   private uglyUnscoped = new RegExp("","g");
   /** condictional ranges: tracks ranges where any edit within the range should cause the entire range to be reparsed */
   private conditionalRanges = new RangeSet();
+  /** Variants of the pretty decorations whose text is padded with spaces to preserve the alignment of the text that follows; keyed by `makePaddedKey` */
+  private paddedDecorations = new Map<string, PrettySubstitution>();
   /** ranges of hidden text */
   private uglyDecorationRanges = new DisjointRangeSet();
   // /** ranges of non-hidden, styled text */
@@ -71,13 +75,14 @@ export class PrettyModel implements vscode.Disposable {
   private grammarState : tm.StackElement[] = [];
   private grammar : null|tm.IGrammar = null;
 
-  public constructor(doc: DocumentModel, settings: LanguageEntry, options: {hideTextMethod: HideTextMethod, insertionPosition?: InsertionPosition, textMateGrammar?: tm.IGrammar|null},
+  public constructor(doc: DocumentModel, settings: LanguageEntry, options: {hideTextMethod: HideTextMethod, insertionPosition?: InsertionPosition, preserveAlignment?: PreserveAlignment, textMateGrammar?: tm.IGrammar|null},
     private document = doc,
     private revealStrategy = settings.revealOn,
     private prettyCursor = settings.prettyCursor,
     private hideTextMethod = options.hideTextMethod,
     private insertionPosition: InsertionPosition = options.insertionPosition || 'before',
     private combineIdenticalScopes = settings.combineIdenticalScopes,
+    private preserveAlignment: PreserveAlignment = options.preserveAlignment || 'off',
   ) {
     this.grammar = options.textMateGrammar || null;
     this.loadDecorations(settings.substitutions);
@@ -97,14 +102,18 @@ export class PrettyModel implements vscode.Disposable {
     const decs : UpdateDecorationEntry[] = [];
     if(this.uglyDecoration)
       decs.push({decoration: this.uglyDecoration, ranges: this.uglyDecorationRanges.getRanges()});
-    for(const subst of this.prettyDecorations.unscoped)
-      decs.push({decoration: subst.decorationType, ranges: subst.ranges.getRanges()});
-    for(const subst of this.prettyDecorations.scoped)
+    for(const subst of this.allSubstitutions())
       decs.push({decoration: subst.decorationType, ranges: subst.ranges.getRanges()});
     if(debugging)
       this.debugDecorations.forEach((val) => decs.push({decoration: val.dec, ranges: val.ranges}));
 
     return decs;
+  }
+
+  private *allSubstitutions() : IterableIterator<PrettySubstitution> {
+    yield *this.prettyDecorations.unscoped;
+    yield *this.prettyDecorations.scoped;
+    yield *this.paddedDecorations.values();
   }
 
   private unloadDecorations() {
@@ -116,16 +125,13 @@ export class PrettyModel implements vscode.Disposable {
     this.conditionalRanges = new RangeSet();
     this.uglyDecorationRanges = new DisjointRangeSet();
     // this.styledDecorationRanges = new DisjointRangeSet();
-    for(const subst of this.prettyDecorations.unscoped)
-      subst.ranges = new DisjointRangeSet();
-    for(const subst of this.prettyDecorations.scoped)
+    for(const subst of this.allSubstitutions())
       subst.ranges = new DisjointRangeSet();
     this.debugDecorations.forEach((val) => val.ranges = []);
 
-    for(const oldDecoration of this.prettyDecorations.unscoped)
+    for(const oldDecoration of this.allSubstitutions())
       oldDecoration.decorationType.dispose();
-    for(const oldDecoration of this.prettyDecorations.scoped)
-      oldDecoration.decorationType.dispose();
+    this.paddedDecorations.clear();
   }
 
   private regexpOptionalGroup(re: string) {
@@ -133,6 +139,58 @@ export class PrettyModel implements vscode.Disposable {
       return `(?:${re})`;
     else
       return "";
+  }
+
+  private makePrettyDecoration(prettySubst: Substitution) : vscode.TextEditorDecorationType {
+    if(!prettySubst.pretty)
+      return decorations.makePrettyDecoration_noPretty(prettySubst);
+    else if(this.hideTextMethod === "hack-fontSize")
+      return decorations.makePrettyDecoration_fontSize_hack(prettySubst, this.insertionPosition);
+    else if(this.hideTextMethod === "hack-letterSpacing")
+      return decorations.makePrettyDecoration_letterSpacing_hack(prettySubst, this.insertionPosition);
+    else
+      return decorations.makePrettyDecoration_noHide(prettySubst, this.insertionPosition);
+  }
+
+  /** Returns the decoration of `subst` whose pretty text is followed by `padding` non-breaking spaces */
+  private getPaddedSubstitution(type: "scoped"|"unscoped", id: number, subst: PrettySubstitution, padding: number) : {key: string, padded: PrettySubstitution} {
+    const key = `${type}:${id}:${padding}`;
+    let padded = this.paddedDecorations.get(key);
+    if(!padded) {
+      // the padding is part of the pretty text, so it is hidden together with it when the ugly text is revealed
+      const source = Object.assign({}, subst.source, {pretty: subst.pretty + '\u00a0'.repeat(padding)});
+      padded = Object.assign({}, subst, {ranges: new DisjointRangeSet(), decorationType: this.makePrettyDecoration(source)});
+      this.paddedDecorations.set(key, padded);
+    }
+    return {key, padded};
+  }
+
+  /**
+   * Computes how many spaces must be added to the pretty text so that the text after it keeps its column.
+   * @returns 0 if no padding applies (disabled, pretty text is not shorter, or the ugly is not followed by the right kind of text)
+   */
+  private getAlignmentPadding(line: string, tokens: tm.IToken[], uglyEnd: number, uglyLength: number, pretty: string) : number {
+    if(this.preserveAlignment === 'off' || this.hideTextMethod === 'none' || !pretty)
+      return 0;
+    const padding = uglyLength - [...pretty].length;
+    if(padding <= 0)
+      return 0;
+
+    // only spaces: the width of a tab depends on its column
+    const spaces = /^ +/.exec(line.substring(uglyEnd));
+    if(!spaces)
+      return 0;
+    const next = uglyEnd + spaces[0].length;
+    if(next >= line.length || line[next] === '\t')
+      return 0;
+    if(this.preserveAlignment === 'end-of-line' && !this.isCommentAt(tokens, next))
+      return 0;
+    return padding;
+  }
+
+  private isCommentAt(tokens: tm.IToken[], index: number) : boolean {
+    const token = tokens.find(t => t.startIndex <= index && index < t.endIndex);
+    return token !== undefined && token.scopes.some(s => s === 'comment' || s.startsWith('comment.'));
   }
 
   private loadDecorations(prettySubstitutions: Substitution[]) {
@@ -163,15 +221,7 @@ export class PrettyModel implements vscode.Disposable {
           continue;
         }
 
-        let decoration = undefined;
-        if(!prettySubst.pretty)
-          decoration = decorations.makePrettyDecoration_noPretty(prettySubst);
-        else if(this.hideTextMethod === "hack-fontSize")
-          decoration = decorations.makePrettyDecoration_fontSize_hack(prettySubst, this.insertionPosition);
-        else if(this.hideTextMethod === "hack-letterSpacing")
-          decoration = decorations.makePrettyDecoration_letterSpacing_hack(prettySubst, this.insertionPosition);
-        else
-          decoration = decorations.makePrettyDecoration_noHide(prettySubst, this.insertionPosition);
+        const decoration = this.makePrettyDecoration(prettySubst);
 
         if(prettySubst.scope) {
           this.prettyDecorations.scoped.push({
@@ -181,6 +231,7 @@ export class PrettyModel implements vscode.Disposable {
             decorationType: decoration,
             index: this.prettyDecorations.scoped.length,
             scope: prettySubst.scope,
+            source: prettySubst,
           });
         } else {
           this.prettyDecorations.unscoped.push({
@@ -189,6 +240,7 @@ export class PrettyModel implements vscode.Disposable {
             ranges: new DisjointRangeSet(),
             decorationType: decoration,
             index: this.prettyDecorations.scoped.length,
+            source: prettySubst,
           });
           uglyAllUnscopedStrings.push(`(?:${uglyStr})`);
         }
@@ -315,6 +367,7 @@ export class PrettyModel implements vscode.Disposable {
     const newStyledRanges = new DisjointRangeSet();
     const newScopedRanges : DisjointRangeSet[] = [];
     const newUnscopedRanges : DisjointRangeSet[] = [];
+    const newPaddedRanges = new Map<string, DisjointRangeSet>();
     const newConditionalRanges = new RangeSet();
     // initialize an empty range set for every id
     this.prettyDecorations.unscoped.forEach(() => newUnscopedRanges.push(new DisjointRangeSet()));
@@ -332,19 +385,24 @@ export class PrettyModel implements vscode.Disposable {
 
       for(let ugly of this.iterateLineUglies(line, tokens)) {
         const uglyRange = new vscode.Range(lineIdx, ugly.start, lineIdx, ugly.end);
-        newConditionalRanges.add(new vscode.Range(lineIdx, ugly.matchStart, lineIdx, ugly.matchEnd));
-        if(ugly.type === "scoped") {
-          if(this.prettyDecorations.scoped[ugly.id].pretty)
-            newUglyRanges.insert(uglyRange);
-          else
-            newStyledRanges.insert(uglyRange);
-          newScopedRanges[ugly.id].insert(uglyRange);        
+        const subst = ugly.type === "scoped" ? this.prettyDecorations.scoped[ugly.id] : this.prettyDecorations.unscoped[ugly.id];
+        const padding = this.getAlignmentPadding(line, tokens, ugly.end, ugly.end - ugly.start, subst.pretty);
+        // the padding depends on the text after the ugly: reparse when it changes
+        const conditionalEnd = padding > 0 || (this.preserveAlignment !== 'off' && line[ugly.end] === ' ') ? line.length : ugly.matchEnd;
+        newConditionalRanges.add(new vscode.Range(lineIdx, ugly.matchStart, lineIdx, Math.max(ugly.matchEnd, conditionalEnd)));
+        if(subst.pretty)
+          newUglyRanges.insert(uglyRange);
+        else
+          newStyledRanges.insert(uglyRange);
+        if(padding > 0) {
+          const {key} = this.getPaddedSubstitution(ugly.type, ugly.id, subst, padding);
+          if(!newPaddedRanges.has(key))
+            newPaddedRanges.set(key, new DisjointRangeSet());
+          newPaddedRanges.get(key).insert(uglyRange);
+        } else if(ugly.type === "scoped") {
+          newScopedRanges[ugly.id].insert(uglyRange);
         } else if(ugly.type === "unscoped") {
-          if(this.prettyDecorations.unscoped[ugly.id].pretty)
-            newUglyRanges.insert(uglyRange);
-          else
-            newStyledRanges.insert(uglyRange);
-          newUnscopedRanges[ugly.id].insert(uglyRange);        
+          newUnscopedRanges[ugly.id].insert(uglyRange);
         }
       }
     }
@@ -368,8 +426,8 @@ export class PrettyModel implements vscode.Disposable {
     this.conditionalRanges.removeOverlapping(overlap, {includeTouchingStart: false, includeTouchingEnd: false});
     this.uglyDecorationRanges.removeOverlapping(hiddenOverlap);
     // this.styledDecorationRanges.removeOverlapping(styledOverlap);
-    this.prettyDecorations.unscoped.forEach(r => r.ranges.removeOverlapping(overlap));
-    this.prettyDecorations.scoped.forEach(r => r.ranges.removeOverlapping(overlap));
+    for(const subst of this.allSubstitutions())
+      subst.ranges.removeOverlapping(overlap);
 
     // add the new pretties & ugly ducklings
     newConditionalRanges.getRanges().forEach(r => this.conditionalRanges.add(r));
@@ -378,6 +436,7 @@ export class PrettyModel implements vscode.Disposable {
     this.prettyDecorations.scoped.forEach((pretty,idx) => {
       pretty.ranges.insertRanges(newScopedRanges[idx])
     });
+    newPaddedRanges.forEach((ranges, key) => this.paddedDecorations.get(key).ranges.insertRanges(ranges));
 
     if(!newStyledRanges.isEmpty() || !newUglyRanges.isEmpty())
       this.changedUglies = true;
@@ -422,11 +481,7 @@ export class PrettyModel implements vscode.Disposable {
         if(removed.length > 0)
           this.changedUglies = true;
 
-        for(const subst of this.prettyDecorations.unscoped) {
-          subst.ranges.removeOverlapping(reparseRange,{includeTouchingStart:true,includeTouchingEnd:true});
-          subst.ranges.shiftRangeDelta(delta);
-        }
-        for(const subst of this.prettyDecorations.scoped) {
+        for(const subst of this.allSubstitutions()) {
           subst.ranges.removeOverlapping(reparseRange,{includeTouchingStart:true,includeTouchingEnd:true});
           subst.ranges.shiftRangeDelta(delta);
         }
@@ -460,9 +515,7 @@ export class PrettyModel implements vscode.Disposable {
   public recomputeDecorations() {
     this.uglyDecorationRanges = new DisjointRangeSet();
     this.grammarState = [];
-    for(const subst of this.prettyDecorations.unscoped)
-      subst.ranges = new DisjointRangeSet();
-    for(const subst of this.prettyDecorations.scoped)
+    for(const subst of this.allSubstitutions())
       subst.ranges = new DisjointRangeSet();
     this.debugDecorations.forEach((val) => val.ranges = [])
 
@@ -491,17 +544,7 @@ export class PrettyModel implements vscode.Disposable {
     const text = this.document.getText(range);
     const substitutions : {start: number, end: number, subst: string}[] = []
 
-    for(let subst of this.prettyDecorations.unscoped) {
-      if(!subst.pretty)
-        continue;
-      const substRanges = subst.ranges.getOverlapRanges(range);
-      for(let sr of substRanges) {
-        const start = textUtil.relativeOffsetAtAbsolutePosition(text, range.start, sr.start);
-        const end = textUtil.relativeOffsetAtAbsolutePosition(text, range.start, sr.end);
-        substitutions.push({start: start, end: end, subst: subst.pretty})
-      }
-    }
-    for(let subst of this.prettyDecorations.scoped) {
+    for(let subst of this.allSubstitutions()) {
       if(!subst.pretty)
         continue;
       const substRanges = subst.ranges.getOverlapRanges(range);

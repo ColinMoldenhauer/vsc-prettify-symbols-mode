@@ -80,6 +80,20 @@
                     "markdownDescription": "Where to insert the 'pretty' text relative to the original ('ugly') text. **Note:** `before` avoids issues with the syntax highlighting, which can occur with `after`.",
                     "default": "before"
                 },
+                "prettifySymbols.preserveAlignment": {
+                    "enum": [
+                        "off",
+                        "end-of-line",
+                        "all"
+                    ],
+                    "enumDescriptions": [
+                        "Do not pad: text after a shortened symbol moves to the left.",
+                        "Pad a shortened symbol if it is followed by spaces and then a comment, so trailing comments stay aligned.",
+                        "Pad a shortened symbol if it is followed by spaces, so that all text after the spaces keeps its column."
+                    ],
+                    "markdownDescription": "Keeps the text after a substitution at its original column by padding the 'pretty' text to the width of the 'ugly' text. Only applies when the 'pretty' text is shorter and is followed by spaces (tabs are not supported). `end-of-line` needs a TextMate grammar for the language to detect comments.",
+                    "default": "off"
+                },
                 "prettifySymbols.substitutions": {
                     "type": "array",
                     "description": "A list of substitution settings can be specified for each language.",
