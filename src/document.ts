@@ -177,7 +177,7 @@ export class PrettyDocumentController implements vscode.Disposable {
   }
 
   private lastSelections = new Map<vscode.TextEditor, readonly vscode.Selection[]>();
-  public adjustCursor(editor: vscode.TextEditor): null|readonly vscode.Selection[] {
+  public adjustCursor(editor: vscode.TextEditor, fromMouse: boolean = false): null|readonly vscode.Selection[] {
     let updated = false;
     let adjustedSelections : vscode.Selection[] = [];
     let before = this.lastSelections.get(editor);
@@ -194,7 +194,10 @@ export class PrettyDocumentController implements vscode.Disposable {
         adjustedSelections.push(new vscode.Selection(sel.anchor,sel.active));
         return;
       }
-      const adjusted = pos.adjustCursorMovement(before[idx].active,sel.active,this.document,this.model.getPrettySubstitutionsRanges());
+      const ranges = this.model.getPrettySubstitutionsRanges();
+      const adjusted = fromMouse
+        ? {pos: pos.adjustMouseSelection(sel.anchor,sel.active,ranges)}
+        : pos.adjustCursorMovement(before[idx].active,sel.active,this.document,ranges);
       if(!adjusted.pos.isEqual(sel.active)) {
         updated = true;
       }
@@ -224,11 +227,11 @@ export class PrettyDocumentController implements vscode.Disposable {
    * box symbols, tec. as needed.
    * @param editor 
    */
-  public selectionChanged(editor: vscode.TextEditor) {
+  public selectionChanged(editor: vscode.TextEditor, fromMouse: boolean = false) {
     this.updateSelection.call(() => {
       let selections: null|readonly vscode.Selection[];
       if(this.adjustCursorMovement) {
-        selections = this.adjustCursor(editor);
+        selections = this.adjustCursor(editor, fromMouse);
       } else {
         selections = editor.selections;
       }

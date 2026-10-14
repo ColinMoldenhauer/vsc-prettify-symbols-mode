@@ -159,7 +159,7 @@ function selectionChanged(event: vscode.TextEditorSelectionChangeEvent) {
   try {
     const prettyDoc = documents.get(event.textEditor.document.uri);
     if(prettyDoc)
-      prettyDoc.selectionChanged(event.textEditor);
+      prettyDoc.selectionChanged(event.textEditor, event.kind === vscode.TextEditorSelectionChangeKind.Mouse);
   } catch(e) {
     console.error(e);
   }

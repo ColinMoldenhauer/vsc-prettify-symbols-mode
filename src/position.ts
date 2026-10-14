@@ -14,6 +14,25 @@ export function adjustCursorMovement(start: vscode.Position, end: vscode.Positio
 	return {pos: end, range: undefined};
 }
 
+/**
+ * The editor resolves a mouse click next to a hidden symbol to a column inside
+ * the hidden text (all of its columns share the same x position). Move such
+ * a position to an edge of the symbol: the end for a click, and the edge away
+ * from the anchor for a selection.
+ */
+export function adjustMouseSelection(anchor: vscode.Position, active: vscode.Position, avoidRanges: vscode.Range[]) : vscode.Position {
+  try {
+    const match = findInSortedRanges(active, avoidRanges, {excludeStart: true, excludeEnd: true});
+    if(match) {
+      if(anchor.isBeforeOrEqual(match.range.start) || anchor.isEqual(active))
+        return match.range.end;
+      else if(anchor.isAfterOrEqual(match.range.end))
+        return match.range.start;
+    }
+  } catch(e) {}
+  return active;
+}
+
 // function findClosestInPrettyDecorations(pos: vscode.Position, prettySubsts: PrettySubstitution[], options: {excludeStart?: boolean, excludeEnd?: boolean} = {excludeStart: false, excludeEnd: false}) {
 // 	for(let prettyIdx = 0; prettyIdx < prettySubsts.length; ++prettyIdx) {
 // 		const subst = prettySubsts[prettyIdx];
