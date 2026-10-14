@@ -1,4 +1,4 @@
-## Unreleased
+## 2.3.0 (fork)
 * with `adjustCursorMovement`, a mouse click next to a symbol no longer places the cursor inside the hidden text (e.g. before the `0` of `eps_0` when clicking on the left half of the following `+`): the cursor moves to the end of the symbol (or, when dragging, to the edge facing away from the anchor)
 * declare `prettifySymbols.hideTextMethod` as a global setting (it was only declared inside language entries, where it was ignored); a language entry's `hideTextMethod` now overrides it
 * fix symbols being drawn several times when the settings are reloaded while a grammar is loading (e.g. after saving settings): superseded document loads no longer create orphaned controllers
