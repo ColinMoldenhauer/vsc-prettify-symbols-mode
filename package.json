@@ -67,6 +67,18 @@
                     "description": "Controls how a 'pretty' symbol is rendered when contacted by a cursor. Options are -- 'boxed': render an outline around the symbol; 'none': no change. This option may be overriden per-language by specifying 'prettyCursor' in a language entry.",
                     "default": "boxed"
                 },
+                "prettifySymbolsModeContinued.insertionPosition": {
+                    "enum": [
+                        "before",
+                        "after"
+                    ],
+                    "enumDescriptions": [
+                        "Insert the 'pretty' text before the original text. Recommended: avoids issues with the syntax highlighting.",
+                        "Insert the 'pretty' text after the original text."
+                    ],
+                    "markdownDescription": "Where to insert the 'pretty' text relative to the original ('ugly') text. **Note:** `before` avoids issues with the syntax highlighting, which can occur with `after`.",
+                    "default": "before"
+                },
                 "prettifySymbolsModeContinued.substitutions": {
                     "type": "array",
                     "description": "A list of substitution settings can be specified for each language.",

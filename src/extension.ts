@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as util from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
-import {Settings, LanguageEntry, Substitution, UglyRevelation, PrettyCursor, HideTextMethod} from './configuration';
+import {Settings, LanguageEntry, Substitution, UglyRevelation, PrettyCursor, HideTextMethod, InsertionPosition} from './configuration';
 import {PrettyDocumentController} from './document';
 import * as api from './api';
 import * as tm from './text-mate';
@@ -184,6 +184,7 @@ function reloadConfiguration() {
     adjustCursorMovement: configuration.get<boolean>("adjustCursorMovement",false),
     prettyCursor: configuration.get<PrettyCursor>("prettyCursor","boxed"),
     hideTextMethod: configuration.get<HideTextMethod>("hideTextMethod","hack-letterSpacing"),
+    insertionPosition: configuration.get<InsertionPosition>("insertionPosition","before"),
   };
 
   // Set default values for language-properties that were not specified
@@ -281,7 +282,7 @@ async function openDocument(doc: vscode.TextDocument) {
             console.error(error);
           }
         }
-        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, textMateGrammar: grammar}));
+        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, insertionPosition: settings.insertionPosition, textMateGrammar: grammar}));
       }
     }
   } catch(err) {}

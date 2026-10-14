@@ -13,6 +13,9 @@ export type PrettyCursor =
     'boxed' // render an outline around the symbol
 	| 'none'  // do change to the symbol
 
+/** Where the "pretty" text is inserted relative to the original ("ugly") text */
+export type InsertionPosition = 'before' | 'after';
+
 /** Essentially mirrors vscode.DecorationRenderOptions, but restricted to the
  * properties that apply to both :before/:after decorations and plain decorations */
 export interface PrettyStyleProperties {
@@ -91,4 +94,6 @@ export interface Settings {
   prettyCursor: PrettyCursor,
 	/** */
 	hideTextMethod: HideTextMethod,
+	/** where to insert the "pretty" text relative to the original text */
+	insertionPosition: InsertionPosition,
 }

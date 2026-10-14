@@ -6,7 +6,7 @@
  * Models the substitutions within a text document
  */
 import * as vscode from 'vscode';
-import {Substitution, UglyRevelation, LanguageEntry, PrettyCursor, PrettyStyleProperties, PrettyStyle, assignStyleProperties, HideTextMethod} from './configuration';
+import {Substitution, UglyRevelation, LanguageEntry, PrettyCursor, PrettyStyleProperties, PrettyStyle, assignStyleProperties, HideTextMethod, InsertionPosition} from './configuration';
 import {RangeSet} from './RangeSet';
 import {DisjointRangeSet} from './DisjointRangeSet';
 import * as drangeset from './DisjointRangeSet';
@@ -71,11 +71,12 @@ export class PrettyModel implements vscode.Disposable {
   private grammarState : tm.StackElement[] = [];
   private grammar : null|tm.IGrammar = null;
 
-  public constructor(doc: DocumentModel, settings: LanguageEntry, options: {hideTextMethod: HideTextMethod, textMateGrammar?: tm.IGrammar|null},
+  public constructor(doc: DocumentModel, settings: LanguageEntry, options: {hideTextMethod: HideTextMethod, insertionPosition?: InsertionPosition, textMateGrammar?: tm.IGrammar|null},
     private document = doc,
     private revealStrategy = settings.revealOn,
     private prettyCursor = settings.prettyCursor,
     private hideTextMethod = options.hideTextMethod,
+    private insertionPosition: InsertionPosition = options.insertionPosition || 'before',
     private combineIdenticalScopes = settings.combineIdenticalScopes,
   ) {
     this.grammar = options.textMateGrammar || null;
@@ -139,11 +140,11 @@ export class PrettyModel implements vscode.Disposable {
 
     let dec : {uglyDecoration: vscode.TextEditorDecorationType, revealedUglyDecoration: vscode.TextEditorDecorationType, boxedSymbolDecoration: vscode.DecorationInstanceRenderOptions}
     if(this.hideTextMethod === "hack-fontSize")
-      dec = decorations.makeDecorations_fontSize_hack();
+      dec = decorations.makeDecorations_fontSize_hack(this.insertionPosition);
     else if(this.hideTextMethod === "hack-letterSpacing")
-      dec = decorations.makeDecorations_letterSpacing_hack();
+      dec = decorations.makeDecorations_letterSpacing_hack(this.insertionPosition);
     else
-      dec = decorations.makeDecorations_none();
+      dec = decorations.makeDecorations_none(this.insertionPosition);
     this.uglyDecoration = dec.uglyDecoration;
     this.revealedUglyDecoration = dec.revealedUglyDecoration;
     this.boxedSymbolDecoration = dec.boxedSymbolDecoration;
@@ -166,11 +167,11 @@ export class PrettyModel implements vscode.Disposable {
         if(!prettySubst.pretty)
           decoration = decorations.makePrettyDecoration_noPretty(prettySubst);
         else if(this.hideTextMethod === "hack-fontSize")
-          decoration = decorations.makePrettyDecoration_fontSize_hack(prettySubst);
+          decoration = decorations.makePrettyDecoration_fontSize_hack(prettySubst, this.insertionPosition);
         else if(this.hideTextMethod === "hack-letterSpacing")
-          decoration = decorations.makePrettyDecoration_letterSpacing_hack(prettySubst);
+          decoration = decorations.makePrettyDecoration_letterSpacing_hack(prettySubst, this.insertionPosition);
         else
-          decoration = decorations.makePrettyDecoration_noHide(prettySubst);
+          decoration = decorations.makePrettyDecoration_noHide(prettySubst, this.insertionPosition);
 
         if(prettySubst.scope) {
           this.prettyDecorations.scoped.push({

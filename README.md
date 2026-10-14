@@ -59,6 +59,12 @@ By default, any "pretty" symbol that comes into contact with the cursor will be 
 * `"boxed"`: display a box around a symbol (only visible if the "ugly" text is not revealed); or
 * `"none"`: do not change the appearance of the symbol.
 
+### Insertion position
+
+By default, the "pretty" text is inserted *before* the original text. Specify `"prettifySymbolsModeContinued.insertionPosition"` to change this. Options are:
+* `"before"`: insert the "pretty" text before the original text (default); this avoids issues with the syntax highlighting; or
+* `"after"`: insert the "pretty" text after the original text.
+
 ### Adjust cursor movement
 
 By default, cursor movement will traverse the characters of the "ugly" text -- this will cause it to become invisible while inside the text if it is not revealed (see `"revealOn"`). Setting `"prettifySymbolsModeContinued.adjustCursorMovement"` to `true` will tweak cursor movement so that "pretty" symbols behave as a single character. This can be overriden per-language by specifying `"adjustCursorMovement"` in a language entry. In particular, left or right movement will cause the cursor to jump over the symbol instead of going inside. However, this setting does not currently account for all kinds of cursor movement, e.g. up/down.
