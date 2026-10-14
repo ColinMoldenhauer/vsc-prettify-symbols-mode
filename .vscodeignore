@@ -10,3 +10,6 @@ tsconfig.json
 scripts/**
 dist/**
 .github/**
+dump/**
+images/*.svg
+docs/**
