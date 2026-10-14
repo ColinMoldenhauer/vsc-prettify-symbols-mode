@@ -14,6 +14,8 @@ let prettySymbolsEnabled = true;
 
 /** Tracks all documents that substitutions are being applied to */
 let documents = new Map<vscode.Uri,PrettyDocumentController>();
+/** Incremented whenever all documents are unloaded; lets `openDocument` notice that it was superseded while it awaited the grammar */
+let documentsGeneration = 0;
 /** The current configuration */
 let settings : Settings;
 
@@ -269,6 +271,7 @@ async function loadGrammar(scopeName: string) : Promise<tm.IGrammar> {
 async function openDocument(doc: vscode.TextDocument) {
   if(!prettySymbolsEnabled)
     return;
+  const generation = documentsGeneration;
   try {
     const prettyDoc = documents.get(doc.uri);
     if(prettyDoc) {
@@ -286,6 +289,10 @@ async function openDocument(doc: vscode.TextDocument) {
             console.error(error);
           }
         }
+        // the grammar is loaded asynchronously: the settings may have been reloaded, or the document been opened or closed in the meantime;
+        // creating a controller now would leave an orphan that keeps drawing its own decorations
+        if(generation !== documentsGeneration || doc.isClosed || documents.has(doc.uri))
+          return;
         documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, insertionPosition: settings.insertionPosition, preserveAlignment: settings.preserveAlignment, textMateGrammar: grammar}));
       }
     }
@@ -301,6 +308,7 @@ function closeDocument(doc: vscode.TextDocument) {
 }
 
 function unloadDocuments() {
+  ++documentsGeneration;
   for(const prettyDoc of documents.values()) {
     prettyDoc.dispose();
   }
