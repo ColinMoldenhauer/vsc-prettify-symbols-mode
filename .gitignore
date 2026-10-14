@@ -4,3 +4,4 @@ typings
 *.vsix
 dist
 dump
+CLAUDE.md
