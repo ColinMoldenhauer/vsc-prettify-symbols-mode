@@ -1,3 +1,6 @@
+## Unreleased
+* new extension icon: `alpha` translated into `α`, as two cards; the previous icon is now the showcase image in the README
+
 ## 2.2.0 (fork)
 * *breaking*: shorten the prefix of all settings and commands from `prettifySymbolsModeContinued` to `prettifySymbols` (e.g. `prettifySymbols.substitutions`); the extension ID is unchanged
 * add an extension icon
