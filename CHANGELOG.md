@@ -1,5 +1,7 @@
-## Unreleased
+## 2.1.0 (fork)
 * add setting `prettifySymbolsModeContinued.insertionPosition` (`"before"` (default) or `"after"`) to choose where the "pretty" text is inserted relative to the original text; `"before"` avoids issues with the syntax highlighting
+* publish to Open VSX from the release workflow
+* make `npm test` runnable outside an extension host
 
 ## 2.0.1 (fork)
 * publish to the VS Code Marketplace from the release workflow (Microsoft Entra ID, no personal access token)
