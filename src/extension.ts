@@ -293,7 +293,7 @@ async function openDocument(doc: vscode.TextDocument) {
         // creating a controller now would leave an orphan that keeps drawing its own decorations
         if(generation !== documentsGeneration || doc.isClosed || documents.has(doc.uri))
           return;
-        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: settings.hideTextMethod, insertionPosition: settings.insertionPosition, preserveAlignment: settings.preserveAlignment, textMateGrammar: grammar}));
+        documents.set(doc.uri, new PrettyDocumentController(doc, language, {hideTextMethod: language.hideTextMethod || settings.hideTextMethod, insertionPosition: settings.insertionPosition, preserveAlignment: settings.preserveAlignment, textMateGrammar: grammar}));
       }
     }
   } catch(err) {}

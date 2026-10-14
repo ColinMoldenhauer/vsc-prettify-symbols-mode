@@ -71,6 +71,13 @@ By default, the "pretty" text is inserted *before* the original text. Specify `"
 * `"before"`: insert the "pretty" text before the original text (default); this avoids issues with the syntax highlighting; or
 * `"after"`: insert the "pretty" text after the original text.
 
+### Hide text method
+
+The "ugly" text is hidden with a CSS trick; specify `"prettifySymbols.hideTextMethod"` to change it, or per-language by specifying `"hideTextMethod"` within a language entry. Options are:
+* `"hack-letterSpacing"`: hide the text with a negative letter spacing (default);
+* `"hack-fontSize"`: hide the text by shrinking its font size; or
+* `"none"`: do not hide the text; the "pretty" text is shown next to it.
+
 ### Preserve alignment
 
 A "pretty" symbol that is shorter than the "ugly" text it replaces moves the text after it to the left, which misaligns e.g. trailing comments. Specify `"prettifySymbols.preserveAlignment"` to compensate: the width lost by the symbols in front of a gap (a run of spaces) is added at the end of that gap, directly before the next text, as non-breaking spaces. The symbols stay compact and the text after the gap keeps its column. This works no matter where in a word the symbol is (e.g. `sigma` in `sigma_free`). The padding disappears while a symbol in front of it is revealed (see `"revealOn"`). Options are:

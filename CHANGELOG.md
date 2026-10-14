@@ -1,4 +1,5 @@
 ## Unreleased
+* declare `prettifySymbols.hideTextMethod` as a global setting (it was only declared inside language entries, where it was ignored); a language entry's `hideTextMethod` now overrides it
 * fix symbols being drawn several times when the settings are reloaded while a grammar is loading (e.g. after saving settings): superseded document loads no longer create orphaned controllers
 * fix TextMate grammars not loading on current VS Code versions (promise-based `vscode-textmate` API): documents using `scope` substitutions were never prettified; the callback-based API of old `vscode-textmate` versions is no longer supported
 * give up loading a grammar after 10 s so that the document is prettified without it instead of not at all

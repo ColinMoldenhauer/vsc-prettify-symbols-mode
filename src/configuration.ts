@@ -76,6 +76,8 @@ export interface LanguageEntry {
 	revealOn?: UglyRevelation;
 	/** rendering tweaks to a symbol when in proximity to the cursor */
 	prettyCursor?: PrettyCursor;
+	/** how to hide the substituted text */
+	hideTextMethod?: HideTextMethod;
 	/** The filename of the language's grammar. If specified, substitutions' scope entries refer to scope names in the given grammar. If undefined, then search for a grammar.*/
 	textMateGrammar?: string;
 	/** Override the TextMate scope for the language */

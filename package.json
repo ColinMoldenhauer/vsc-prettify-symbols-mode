@@ -80,6 +80,20 @@
                     "markdownDescription": "Where to insert the 'pretty' text relative to the original ('ugly') text. **Note:** `before` avoids issues with the syntax highlighting, which can occur with `after`.",
                     "default": "before"
                 },
+                "prettifySymbols.hideTextMethod": {
+                    "enum": [
+                        "hack-letterSpacing",
+                        "hack-fontSize",
+                        "none"
+                    ],
+                    "enumDescriptions": [
+                        "Hide the original text with a negative letter spacing.",
+                        "Hide the original text by shrinking its font size.",
+                        "Do not hide the original text: the 'pretty' text is shown next to it."
+                    ],
+                    "markdownDescription": "How to hide the original ('ugly') text that is substituted. This option may be overriden per-language by specifying `hideTextMethod` in a language entry.",
+                    "default": "hack-letterSpacing"
+                },
                 "prettifySymbols.preserveAlignment": {
                     "enum": [
                         "off",
