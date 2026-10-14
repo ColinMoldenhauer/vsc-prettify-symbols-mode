@@ -4,7 +4,7 @@ Prettify symbols mode makes *visual* substitutions to your source code, e.g. dis
 
 This feature is inspired by [prettify-symbols-mode for Emacs](https://www.emacswiki.org/emacs/PrettySymbol).
 
-> **Note:** this is a maintained fork of [siegebell/vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode), which is no longer maintained. It can be installed next to the original: all commands and settings use the prefix `prettifySymbolsModeContinued` instead of `prettifySymbolsMode`, so existing settings need to be renamed (e.g. `prettifySymbolsMode.substitutions` becomes `prettifySymbolsModeContinued.substitutions`); the old keys are silently ignored. See the [CHANGELOG](CHANGELOG.md) for differences.
+> **Note:** this is a maintained fork of [siegebell/vsc-prettify-symbols-mode](https://github.com/siegebell/vsc-prettify-symbols-mode), which is no longer maintained. It can be installed next to the original: all commands and settings use the prefix `prettifySymbols` instead of `prettifySymbolsMode`, so existing settings need to be renamed (e.g. `prettifySymbolsMode.substitutions` becomes `prettifySymbols.substitutions`); the old keys are silently ignored. See the [CHANGELOG](CHANGELOG.md) for differences.
 
 
 ## Installation
@@ -24,7 +24,7 @@ It is also published on [Open VSX](https://open-vsx.org/extension/ColinMoldenhau
 
 Once you have installed this extension, modify  `settings.json` to add language-specific substitutions. For example, the following settings will target F# files, rendering `fun` as `λ`,  `->` as `⟶`, and place a border around parameters.
 ```json
-"prettifySymbolsModeContinued.substitutions": [{
+"prettifySymbols.substitutions": [{
     "language": "fsharp",
     "substitutions": [
       { "ugly": "fun", "pretty": "λ", "scope": "keyword.other.function-definition.fsharp" },
@@ -46,7 +46,7 @@ By default, regular expressions match against a whole line of text. If `"scope"`
 
 ### Revealing symbols
 
-By default, "ugly" text will be revealed while contacted by a cursor. You may override this behavior by specifying `"prettifySymbolsModeContinued.revealOn"`, or per-language by specifying `"revealOn"` within a language entry. Options are:
+By default, "ugly" text will be revealed while contacted by a cursor. You may override this behavior by specifying `"prettifySymbols.revealOn"`, or per-language by specifying `"revealOn"` within a language entry. Options are:
 * `"cursor"`: reveal while a cursor contacts the symbol (default);
 * `"cursor-inside"`: reveal while a cursor is *inside* the symbol;
 * `"active-line"`: reveal all symbols while on the same line as a cursor;
@@ -55,19 +55,19 @@ By default, "ugly" text will be revealed while contacted by a cursor. You may ov
 
 ### Pretty cursor
 
-By default, any "pretty" symbol that comes into contact with the cursor will be rendered with a box outline around it. This effect is only visible if the "ugly" text is not revealed (e.g. `"revealOn": "none"`). You can control this setting by specifying `"prettifySymbolsModeContinued.prettyCursor"`, or per-language by specifying `"prettyCursor"` within a language entry. Options are:
+By default, any "pretty" symbol that comes into contact with the cursor will be rendered with a box outline around it. This effect is only visible if the "ugly" text is not revealed (e.g. `"revealOn": "none"`). You can control this setting by specifying `"prettifySymbols.prettyCursor"`, or per-language by specifying `"prettyCursor"` within a language entry. Options are:
 * `"boxed"`: display a box around a symbol (only visible if the "ugly" text is not revealed); or
 * `"none"`: do not change the appearance of the symbol.
 
 ### Insertion position
 
-By default, the "pretty" text is inserted *before* the original text. Specify `"prettifySymbolsModeContinued.insertionPosition"` to change this. Options are:
+By default, the "pretty" text is inserted *before* the original text. Specify `"prettifySymbols.insertionPosition"` to change this. Options are:
 * `"before"`: insert the "pretty" text before the original text (default); this avoids issues with the syntax highlighting; or
 * `"after"`: insert the "pretty" text after the original text.
 
 ### Adjust cursor movement
 
-By default, cursor movement will traverse the characters of the "ugly" text -- this will cause it to become invisible while inside the text if it is not revealed (see `"revealOn"`). Setting `"prettifySymbolsModeContinued.adjustCursorMovement"` to `true` will tweak cursor movement so that "pretty" symbols behave as a single character. This can be overriden per-language by specifying `"adjustCursorMovement"` in a language entry. In particular, left or right movement will cause the cursor to jump over the symbol instead of going inside. However, this setting does not currently account for all kinds of cursor movement, e.g. up/down.
+By default, cursor movement will traverse the characters of the "ugly" text -- this will cause it to become invisible while inside the text if it is not revealed (see `"revealOn"`). Setting `"prettifySymbols.adjustCursorMovement"` to `true` will tweak cursor movement so that "pretty" symbols behave as a single character. This can be overriden per-language by specifying `"adjustCursorMovement"` in a language entry. In particular, left or right movement will cause the cursor to jump over the symbol instead of going inside. However, this setting does not currently account for all kinds of cursor movement, e.g. up/down.
 
 ### Styling
 
@@ -84,23 +84,23 @@ This extension uses [Javascript's regular expression](https://developer.mozilla.
 ### Commands
 
 The following commands are available for keybinding:
-* `prettifySymbolsModeContinued.copyWithSubstitutions`: copy selected text with "pretty" substitutions applied
-* `prettifySymbolsModeContinued.enablePrettySymbols`: globally *enable* prettify symbols mode
-* `prettifySymbolsModeContinued.disablePrettySymbols`: globally *disable* prettify symbols mode
-* `prettifySymbolsModeContinued.togglePrettySymbols`: globally *toggle* prettify symbols mode
+* `prettifySymbols.copyWithSubstitutions`: copy selected text with "pretty" substitutions applied
+* `prettifySymbols.enablePrettySymbols`: globally *enable* prettify symbols mode
+* `prettifySymbols.disablePrettySymbols`: globally *disable* prettify symbols mode
+* `prettifySymbols.togglePrettySymbols`: globally *toggle* prettify symbols mode
 
 
 ### Common settings for `settings.json`
 
 * **Default:** symbols are unfolded as they are traversed by the cursor. 
 ```json
-"prettifySymbolsModeContinued.renderOn": "cursor",
-"prettifySymbolsModeContinued.adjustCursorMovement": false,
+"prettifySymbols.renderOn": "cursor",
+"prettifySymbols.adjustCursorMovement": false,
 ```
 * Suggested alternative: symbols are never unfolded and generally act like a single character w.r.t. cursor movement. 
 ```json
-"prettifySymbolsModeContinued.renderOn": "none",
-"prettifySymbolsModeContinued.adjustCursorMovement": true,
+"prettifySymbols.renderOn": "none",
+"prettifySymbols.adjustCursorMovement": true,
 ```
 
 ## Variable-width symbols driving you crazy?
@@ -125,9 +125,9 @@ Check out [*Monospacifier*](https://github.com/cpitclaudel/monospacifier) to fix
 
 The following shows a brief subset of useful substitutions for Haskell, OCaml, and F#:
 ```json
-"prettifySymbolsModeContinued.revealOn": "cursor",
-"prettifySymbolsModeContinued.adjustCursorMovement": false,
-"prettifySymbolsModeContinued.substitutions": [{
+"prettifySymbols.revealOn": "cursor",
+"prettifySymbols.adjustCursorMovement": false,
+"prettifySymbols.substitutions": [{
   "language": "haskell",
   "revealOn": "active-line",
   "substitutions": [

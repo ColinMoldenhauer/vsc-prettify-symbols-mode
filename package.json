@@ -19,22 +19,22 @@
     "contributes": {
         "commands": [
             {
-                "command": "prettifySymbolsModeContinued.copyWithSubstitutions",
+                "command": "prettifySymbols.copyWithSubstitutions",
                 "title": "Copy with Substitutions",
                 "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsModeContinued.enablePrettySymbols",
+                "command": "prettifySymbols.enablePrettySymbols",
                 "title": "Enable",
                 "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsModeContinued.disablePrettySymbols",
+                "command": "prettifySymbols.disablePrettySymbols",
                 "title": "Disable",
                 "category": "Prettify Symbols Mode (Continued)"
             },
             {
-                "command": "prettifySymbolsModeContinued.togglePrettySymbols",
+                "command": "prettifySymbols.togglePrettySymbols",
                 "title": "Toggle",
                 "category": "Prettify Symbols Mode (Continued)"
             }
@@ -43,7 +43,7 @@
             "type": "object",
             "title": "Prettify symbols mode",
             "properties": {
-                "prettifySymbolsModeContinued.revealOn": {
+                "prettifySymbols.revealOn": {
                     "enum": [
                         "cursor",
                         "cursor-inside",
@@ -54,12 +54,12 @@
                     "description": "When to reveal the original text. Options are -- 'cursor': reveal when a cursor contacts a symbol; 'cursor-inside': reveal when a cursor is inside a symbol; 'active-line': reveal all symbols on the same line as a cursor; 'selection': reveal all symbols that are selected or contact a cursor; 'none': do not reveal. This option may be overriden per-language by specifying 'revealOn' in a language entry.",
                     "default": "cursor"
                 },
-                "prettifySymbolsModeContinued.adjustCursorMovement": {
+                "prettifySymbols.adjustCursorMovement": {
                     "type": "boolean",
                     "description": "If enabled, cursor movement will treat 'pretty' symbols as one character instead of stepping through the underlying 'ugly' text (this does not currently cover all situations). This option may be overriden per-language by specifying 'adjustCursorMovement' in a language entry.",
                     "default": false
                 },
-                "prettifySymbolsModeContinued.prettyCursor": {
+                "prettifySymbols.prettyCursor": {
                     "enum": [
                         "boxed",
                         "none"
@@ -67,7 +67,7 @@
                     "description": "Controls how a 'pretty' symbol is rendered when contacted by a cursor. Options are -- 'boxed': render an outline around the symbol; 'none': no change. This option may be overriden per-language by specifying 'prettyCursor' in a language entry.",
                     "default": "boxed"
                 },
-                "prettifySymbolsModeContinued.insertionPosition": {
+                "prettifySymbols.insertionPosition": {
                     "enum": [
                         "before",
                         "after"
@@ -79,7 +79,7 @@
                     "markdownDescription": "Where to insert the 'pretty' text relative to the original ('ugly') text. **Note:** `before` avoids issues with the syntax highlighting, which can occur with `after`.",
                     "default": "before"
                 },
-                "prettifySymbolsModeContinued.substitutions": {
+                "prettifySymbols.substitutions": {
                     "type": "array",
                     "description": "A list of substitution settings can be specified for each language.",
                     "items": {

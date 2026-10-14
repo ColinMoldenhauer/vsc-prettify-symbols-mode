@@ -1,3 +1,6 @@
+## 2.2.0 (fork)
+* *breaking*: shorten the prefix of all settings and commands from `prettifySymbolsModeContinued` to `prettifySymbols` (e.g. `prettifySymbols.substitutions`); the extension ID is unchanged
+
 ## 2.1.0 (fork)
 * add setting `prettifySymbolsModeContinued.insertionPosition` (`"before"` (default) or `"after"`) to choose where the "pretty" text is inserted relative to the original text; `"before"` avoids issues with the syntax highlighting
 * publish to Open VSX from the release workflow
