@@ -5,6 +5,7 @@
     "//version": "Placeholder. The release workflow replaces it with the version of the pushed v* tag (and removes this key) at build time.",
     "version": "0.0.0-development",
     "publisher": "ColinMoldenhauer",
+    "icon": "images/icon.png",
     "license": "MIT license (MIT)",
     "engines": {
         "vscode": "^1.75.0"
