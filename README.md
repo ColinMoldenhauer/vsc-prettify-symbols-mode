@@ -193,6 +193,17 @@ To try changes without packaging, open the repository in VS Code and press `F5` 
 
 `npm run package` takes the version from `git describe --tags`, e.g. `2.0.0-dev` on a tag or `2.0.0-dev-3-gabc1234` between tags (`-dirty` with uncommitted changes), and leaves `package.json` untouched.
 
+### Testing
+Install the dependencies once with `npm install`, then run the unit tests with:
+
+```sh
+npm test
+```
+
+This compiles the sources and runs the [mocha](https://mochajs.org/) tests in `test/` (`*.test.ts`) with plain Node.js; no VS Code instance is needed. The tests do not run inside the extension host: `import 'vscode'` is redirected to a minimal stand-in, [test/vscode-shunt.ts](test/vscode-shunt.ts), via [test/register-vscode.ts](test/register-vscode.ts). If a test needs another part of the VS Code API, add it to the shunt. Use `npm run test-debug` to wait for a debugger (`--inspect-brk`).
+
+Anything that needs the real VS Code (e.g. loading TextMate grammars) is not covered; check it manually in an Extension Development Host (`F5`).
+
 ### Releasing
 Push a tag of the form `v<major>.<minor>.<patch>`, optionally with a suffix such as `-dev`:
 
