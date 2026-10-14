@@ -73,12 +73,12 @@ By default, the "pretty" text is inserted *before* the original text. Specify `"
 
 ### Preserve alignment
 
-A "pretty" symbol that is shorter than the "ugly" text it replaces moves the text after it to the left, which misaligns e.g. trailing comments. Specify `"prettifySymbols.preserveAlignment"` to pad the "pretty" text with spaces up to the width of the "ugly" text. The padding disappears together with the symbol when the "ugly" text is revealed. Options are:
+A "pretty" symbol that is shorter than the "ugly" text it replaces moves the text after it to the left, which misaligns e.g. trailing comments. Specify `"prettifySymbols.preserveAlignment"` to compensate: the width lost by the symbols in front of a gap (a run of spaces) is added at the end of that gap, directly before the next text, as non-breaking spaces. The symbols stay compact and the text after the gap keeps its column. This works no matter where in a word the symbol is (e.g. `sigma` in `sigma_free`). The padding disappears while a symbol in front of it is revealed (see `"revealOn"`). Options are:
 * `"off"`: do not pad (default);
-* `"end-of-line"`: pad if the symbol is followed by spaces and then a comment, so that trailing comments stay aligned (the comment is detected with the language's TextMate grammar); or
-* `"all"`: pad if the symbol is followed by spaces, so that all text after those spaces keeps its column.
+* `"end-of-line"`: pad only the gap in front of a trailing comment, using the total width lost on the line (the comment is detected with the language's TextMate grammar); or
+* `"all"`: pad every gap of two or more spaces (a single space is left alone), using the width lost since the previous gap.
 
-Only spaces are supported (not tabs), and only the symbol directly in front of the spaces is padded: if a line has further symbols before it, the text after them still shifts.
+Tabs are not supported, and a symbol that is longer than the original text is not compensated.
 
 ### Adjust cursor movement
 
@@ -107,14 +107,16 @@ The following commands are available for keybinding:
 
 ### Common settings for `settings.json`
 
+For a `settings.json` snippet listing all options to copy from, see the [Settings page of the wiki](https://github.com/ColinMoldenhauer/vsc-prettify-symbols-mode/wiki/Settings#example-with-all-options).
+
 * **Default:** symbols are unfolded as they are traversed by the cursor. 
 ```json
-"prettifySymbols.renderOn": "cursor",
+"prettifySymbols.revealOn": "cursor",
 "prettifySymbols.adjustCursorMovement": false,
 ```
 * Suggested alternative: symbols are never unfolded and generally act like a single character w.r.t. cursor movement. 
 ```json
-"prettifySymbols.renderOn": "none",
+"prettifySymbols.revealOn": "none",
 "prettifySymbols.adjustCursorMovement": true,
 ```
 

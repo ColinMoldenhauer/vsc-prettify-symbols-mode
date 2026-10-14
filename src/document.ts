@@ -129,7 +129,7 @@ export class PrettyDocumentController implements vscode.Disposable {
               // Show cursors
               .map(r => ({
                 range: r,
-                renderOptions: cursors && cursors.ranges.isOverlapping(r)
+                renderOptions: cursors && !d.plain && cursors.ranges.isOverlapping(r)
                   ? cursors.decoration
                   : undefined
               }))
